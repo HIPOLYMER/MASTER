@@ -1,0 +1,210 @@
+
+/* SAMPLE INPUT*/
+INSERT INTO basicoption1(year,serial) VALUES ("2006","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2006","2");
+INSERT INTO basicoption1(year,serial) VALUES ("2006","3");
+INSERT INTO basicoption1(year,serial) VALUES ("2006","4");
+INSERT INTO basicoption1(year,serial) VALUES ("2007","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2007","2");
+INSERT INTO basicoption1(year,serial) VALUES ("2007","3");
+INSERT INTO basicoption1(year,serial) VALUES ("2007","4");
+INSERT INTO basicoption1(year,serial) VALUES ("2008","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2008","2");
+INSERT INTO basicoption1(year,serial) VALUES ("2008","3");
+INSERT INTO basicoption1(year,serial) VALUES ("2008","4");
+INSERT INTO basicoption1(year,serial) VALUES ("2009","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2009","2");
+INSERT INTO basicoption1(year,serial) VALUES ("2009","3");
+INSERT INTO basicoption1(year,serial) VALUES ("2009","4");
+INSERT INTO basicoption1(year,serial) VALUES ("2010","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2010","2");
+INSERT INTO basicoption1(year,serial) VALUES ("2010","3");
+INSERT INTO basicoption1(year,serial) VALUES ("2010","4");
+INSERT INTO basicoption1(year,serial) VALUES ("2011","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2011","2");
+INSERT INTO basicoption1(year,serial) VALUES ("2011","3");
+INSERT INTO basicoption1(year,serial) VALUES ("2011","4");
+INSERT INTO basicoption1(year,serial) VALUES ("2012","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2012","2");
+INSERT INTO basicoption1(year,serial) VALUES ("2012","3");
+INSERT INTO basicoption1(year,serial) VALUES ("2012","4");
+INSERT INTO basicoption1(year,serial) VALUES ("2013","1");
+INSERT INTO basicoption1(year,serial) VALUES ("2013","2");
+
+INSERT INTO basicoption2(type,subject) VALUES ("A형","도시계획론");
+INSERT INTO basicoption2(type,subject) VALUES ("B형","도시계획론");
+INSERT INTO basicoption2(type,subject) VALUES ("A형","도시설계 및 단지계획");
+INSERT INTO basicoption2(type,subject) VALUES ("B형","도시설계 및 단지계획");
+INSERT INTO basicoption2(type,subject) VALUES ("A형","도시개발론");
+INSERT INTO basicoption2(type,subject) VALUES ("B형","도시개발론");
+INSERT INTO basicoption2(type,subject) VALUES ("A형","국토 및 지역계회");
+INSERT INTO basicoption2(type,subject) VALUES ("B형","국토 및 지역계회");
+INSERT INTO basicoption2(type,subject) VALUES ("A형","도시계획 관계 법규");
+INSERT INTO basicoption2(type,subject) VALUES ("B형","도시계획 관계 법규");
+INSERT INTO basicoption2(type,subject) VALUES ("A형","도시계획 실무");
+INSERT INTO basicoption2(type,subject) VALUES ("B형","도시계획 실무");
+
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","1. 도시와 도시문제","1. 도시의 개념과 정의");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","1. 도시와 도시문제","2. 도시의 구성요소");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","1. 도시와 도시문제","3. 도시화와 도시문제");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","1. 도시와 도시문제","4. 도시의 유형 분류");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","2. 도시기능체계와 공간구조","1. 도시기능체계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","2. 도시기능체계와 공간구조","2. 도시공간구조의 개념");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","2. 도시기능체계와 공간구조","3. 도시공간구조 이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","3. 도시의 발달","1. 도시의 기원과 고대도시");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","3. 도시의 발달","2. 중세도시");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","3. 도시의 발달","3. 근세도시");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","1. 도시의 개념 및 도시발달","3. 도시의 발달","4. 현대도시");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","1. 도시계획의 개념과 이론","1. 도시계획의 필요성과 정의");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","1. 도시계획의 개념과 이론","2. 도시계획의 범위와 주요 내용");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","1. 도시계획의 개념과 이론","3. 도시계획이론과 사조");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","2. 공간계획체계","1. 공간계획의 특성과 계획체계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","2. 공간계획체계","2. 우리나라의 공간계획체계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","3. 도시계획 관련 제도","1. 도시계획 관련법 체계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","3. 도시계획 관련 제도","2. 도시계획 관련제도의 변천");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","3. 도시계획 관련 제도","3. 도시계획 수립 체계와 절차");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","2. 도시계획 이론과 체계","3. 도시계획 관련 제도","4. 외국의 도시계획제도");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","1. 도시조사","1. 도시조사의 의의와 목적");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","1. 도시조사","2. 도시조사의 범위와 내용");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","1. 도시조사","3. 도시조사 및 분석 방법");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","1. 도시조사","4. 조사자료의 정리와 표현");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","2. GIS","1. GIS의 개념");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","2. GIS","2. GIS의 기능과 역할");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","2. GIS","3. GIS의 활용");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","3. 계획지표 설정","1. 인구지표 ");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","3. 계획지표 설정","2. 사회경제지표");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","3. 도시조사분석과 계획지표","3. 계획지표 설정","3. 생활환경지표");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","1. 토지이용계획","1. 토지이용계획의 목적 ");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","1. 토지이용계획","2. 구성과 수립과정");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","1. 토지이용계획","3. 수요예측");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","1. 토지이용계획","4. 입지배분");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","1. 토지이용계획","5. 토지이용계획의 사례");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","2. 교통계획","1. 도시교통의 특성");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","2. 교통계획","2. 교통계획과정");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","2. 교통계획","3. 수요예측");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","2. 교통계획","4. 도시가로계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","2. 교통계획","5. 녹색교통과 보행자안전");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","3. 도시 시설계획","1. 기반시설의 개념 ");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","3. 도시 시설계획","2. 기반시설의 특성과 유형");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","3. 도시 시설계획","3. 결정기준");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","4. 공원녹지계획","1. 공원녹지의 개념");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","4. 공원녹지계획","2. 공원의 유형과 기준");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","4. 공원녹지계획","3. 공원녹지조성계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","4. 공원녹지계획","4. 친환경적 공원녹지계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","5. 경관계획","1. 경관의 개념과 정의");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","5. 경관계획","2. 경관의 구성요소와 유형");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","5. 경관계획","3. 경관계획의 내용과 기법");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","5. 경관계획","4. 경관관리제도");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","6. 환경계획","1. 도시와 환경");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","6. 환경계획","2. 도시생태계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","4. 부문별계획","6. 환경계획","3. 지속가능한 도시개발");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","1. 토지이용계획의 실행","1. 토지이용계획의 실행수단");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","1. 토지이용계획의 실행","2. 지역지구제");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","2. 도시계획사업의 실행","1. 도시개발사업의 개념과 시행");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","2. 도시계획사업의 실행","2. 도시정비사업의 개념과 시행");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","2. 도시계획사업의 실행","3. 도시계획시설사업의 시행");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","2. 도시계획사업의 실행","4. 도시계획 실행을 위한 재정계획과 계획 평가체계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","3. 도시계획의 다양한 수법","1. 뉴어버니즘(New Urbanism)");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","3. 도시계획의 다양한 수법","2. ESSD와 Eco-city");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","3. 도시계획의 다양한 수법","3. 그린시티(Green City)");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","3. 도시계획의 다양한 수법","4. 스마트시티(Smart City)");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","3. 도시계획의 다양한 수법","5. Compact City");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","3. 도시계획의 다양한 수법","6. U-city");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","5. 도시계획의 실행","3. 도시계획의 다양한 수법","7. 기타");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","6. 도시관리와 도시계획의 미래 전망","1. 도시관리","1. 도시관리의 의의");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","6. 도시관리와 도시계획의 미래 전망","1. 도시관리","2. 도시행정과 재정");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","6. 도시관리와 도시계획의 미래 전망","1. 도시관리","3. 주민참여와 거버넌스");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","6. 도시관리와 도시계획의 미래 전망","1. 도시관리","4. 도시성장관리");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","6. 도시관리와 도시계획의 미래 전망","2. 도시계획의 미래전망과 과제","1. 도시의 변화와 전망");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("도시계획론","6. 도시관리와 도시계획의 미래 전망","2. 도시계획의 미래전망과 과제","2. 미래도시계획의 과제");
+
+
+INSERT INTO problemheader(year,serial,type,subject,classify,level,large,medium,small,pNum)
+		VALUES ("2013","1","A형","언어","응용문제","상","현대문학","시","시인",7);
+INSERT INTO problembody(problem,addition,choice1,choice2,choice3,choice4,keyword,solution)
+		VALUES ("7번문제내용","지문","보기1","보기2","보기3","보기4","핵심단어","해설");
+INSERT INTO problemheader(year,serial,type,subject,classify,level,large,medium,pNum)
+		VALUES ("2013","1","A형","언어","응용문제","상","현대문학","시",8);
+INSERT INTO problembody(problem,addition,choice1,choice2,choice3,choice4,keyword,solution)
+		VALUES ("8번문제내용","지문","보기1","보기2","보기3","보기4","핵심단어","해설");
+
+
+show tables;
+SELECT * FROM basicoption1;
+SELECT * FROM basicoption2;
+SELECT * FROM classification;
+SELECT * FROM problemheader;
+SELECT * FROM problembody;
