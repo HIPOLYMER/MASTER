@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-
+ 
 class SelectOptionsInsForm extends JFrame {
 
 	// 선택 버튼이 눌리면 채워질 변수들
@@ -194,39 +194,33 @@ class SelectOptionsInsForm extends JFrame {
 
 	// 생성자에서 호출되며, 기출 년도, 회차, 유형, 과목을 각 ComboBox에 채워 넣는 함수
 	private void fillInit() {
-		Query query1 =  new Query();
-		Query query2 =  new Query();
-		Query query3 =  new Query();
-		Query query4 =  new Query();
+		Query query =  new Query();
 		Vector<String> selectBasic1 = new Vector<String>();
 		Vector<String> selectBasic2 = new Vector<String>();
-		ResultSet result_year;
-		ResultSet result_serial;
-		ResultSet result_type;
-		ResultSet result_subject;
+		ResultSet resultSet;
 
 		//데이터 베이스에 질의
 		selectBasic1.add(year_CB.getName());
-		result_year = query1.doSelects(selectBasic1, bTable1, null);
+		resultSet = query.doSelects(selectBasic1, bTable1, null);		
 		selectBasic1.clear();
+		parseQuery(resultSet);
 		selectBasic1.add(serial_CB.getName());
-		result_serial = query2.doSelects(selectBasic1, bTable1, null);
-		
+		resultSet = query.doSelects(selectBasic1, bTable1, null);
+		parseQuery(resultSet);
 		selectBasic2.add(type_CB.getName());
-		result_type = query3.doSelects(selectBasic2, bTable2, null);
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
 		selectBasic2.clear();
+		parseQuery(resultSet);
 		selectBasic2.add(subject_CB.getName());
-		result_subject = query4.doSelects(selectBasic2, bTable2, null);
-
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
+		parseQuery(resultSet);
 		//받아온 결과를 파싱 및 ComboBox 에 반영
-		parseQuery(result_year, result_serial,result_type,result_subject);
-		query1.finalize();
-		query2.finalize();
-		query3.finalize();
-		query4.finalize();
+		parseQuery(resultSet);
+		query.close();
+		query.finalize();
 	}
 
-	private void parseQuery(ResultSet result_year, ResultSet result_serial, ResultSet result_type, ResultSet result_subject) {
+	private void parseQuery(ResultSet resultSet) {
 		// fillInit에서 읽어온 쿼리를 addItem 하기 전에 각 항목에 맞는 형태로 파싱하기 위한 작업
 		// 파싱을 하면서 곧 바로 addItem 을 하는 것이 편할 것으로 판단 됨.
 		//1. 파싱
@@ -234,14 +228,21 @@ class SelectOptionsInsForm extends JFrame {
 		// year_CB.addItem(" ");
 		// serial_CB.addItem(); 형식
 		try {
-			while(result_year.next())
-				year_CB.addItem((Integer) result_year.getObject(1));
-			while(result_serial.next())
-				serial_CB.addItem((String) result_serial.getObject(1));
-			while(result_type.next())
-				type_CB.addItem((String) result_type.getObject(1));
-			while(result_subject.next())
-				subject_CB.addItem((String) result_subject.getObject(1));
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			
+			if(metaData.getColumnName(1).equals("year")){
+				while(resultSet.next())
+					year_CB.addItem((Integer) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("serial")){
+				while(resultSet.next())
+					serial_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("type")){
+				while(resultSet.next())
+					type_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("subject")){
+				while(resultSet.next())
+					subject_CB.addItem((String) resultSet.getObject(1));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -254,26 +255,13 @@ class SelectOptionsInsForm extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			JButton button = (JButton) e.getSource();
 			if (button.getName() == "selectButton") {	
-				/*
-				 * 1 checkDanglingElement(); 로 선택 안 된 항목이 있나 체크
-				 * if(에러면) {
-				 * 		message.alertMessage(button.getRootPane().getParent(), "모든 항목을 선택 해야 합니다.");
-				 * } else {
-				 *  //현재 까지 선택된 내용을 각각의 변수에 채워넣는다..(SelectOptionsInsForm 변수 선언 부분에 선언된 변수들)
-				 *
-				 *
-				 * year=(int)year_CB.getSelectedItem();
-				 * serial=serial_CB.getSelectedItem().toString();
-				 *
-				 *
-				 * //2. clearOptions로 화면 초기화
-				 *
-				 * //3.문제삽입 Form 을 생성 insertForm = new InsertProblemForm(); }
-				 */
-				//small_CB.removeAllItems();
-				if(checkDanglingElement()==false){
+
+				//1. checkDanglingElement(); 로 선택 안 된 항목이 있나 체크
+				if(checkDanglingElement()==false){ //에러면
 					message.alertMessage(button.getRootPane().getParent(), "모든 항목을 선택 해야 합니다.");
 				}else {
+					Query query= new Query();
+				//2.현재 까지 선택된 내용을 각각의 변수에 채워넣는다..(SelectOptionsAdjForm 변수 선언부분에 선언된 변수들)
 					year = (int)year_CB.getSelectedItem();
 					serial = serial_CB.getSelectedItem().toString();
 					type = type_CB.getSelectedItem().toString();
@@ -295,18 +283,19 @@ class SelectOptionsInsForm extends JFrame {
 					large = large_CB.getSelectedItem().toString();
 					medium =  medium_CB.getSelectedItem().toString();
 					small = small_CB.getSelectedItem().toString();
-			
+					
+					//2. clearOptions로 화면 초기화
 //이걸 왜함?			clearOptions();
 				}
+				//3.문제삽입 Form 을 생성
 				insertForm = new InsertProblemForm();
 			}
 
 			if (button.getName() == "insertButton") {
 				// 1.checkEmpty(); 로 입력 안 된 항목이 있나 체크
-				// 풀이 는 입력이 안 됐다면 풀이를 입력하지 않을 것인지 물어보는 메시지 상자를 띄우고, 예라면 그냥 넘어가고
-				// 아니오 라면 진행하지 않고 다시 입력을 기다린다.
 				if(checkEmpty()==false){
-					
+// 풀이 는 입력이 안 됐다면 풀이를 입력하지 않을 것인지 물어보는 메시지 상자를 띄우고, 예라면 그냥 넘어가고
+// 아니오 라면 진행하지 않고 다시 입력을 기다린다.				
 				}
 				// 3.에러가 아니라면 번호, 문제 내용 등을 각 변수에 채워 넣는다.(SelectOptionsInsForm 변수
 				// 선언 부분에 선언된 변수들)
@@ -327,6 +316,8 @@ class SelectOptionsInsForm extends JFrame {
 				Query query = new Query();
 				query.doInserts(phTable, insert_phTable);
 				query.doInserts(pbTable, insert_pbTable);
+				query.close();
+				query.finalize();
 				// clearContents() 로 화면 초기화
 				clearContents();
 

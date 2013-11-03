@@ -27,7 +27,8 @@ class Query {
 		try{
 			Class.forName("com.mysql.jdbc.Driver"); //jdbc설치확인
 			connection = DriverManager.getConnection(DATABASE_URL,"root","1234");
-//			System.out.println("데이터베이스 접속 성공");
+			System.out.println("데이터베이스 접속 성공");
+		
 		}
 		catch( ClassNotFoundException e ){
             System.out.println("JDBC 드라이버가 존재하지 않습니다. "+e);
@@ -56,6 +57,14 @@ class Query {
 			exception.printStackTrace();
 		}
 	 }
+	public void close(){
+		try {
+			connection.close();
+			System.out.println("데이터베이스 close()");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	public ResultSet doSelects(Vector<String> select, String from,
 			String where) {
 		// vector 에 들어있는 내용으로 쿼리해서 vector 반환
@@ -176,15 +185,27 @@ class Query {
 		// 문제 수정에서 선택 버튼이 눌렸을 때 ProblemID 를 리턴해주는 함수
 		// select problemID from table where wherecond.get(0) 형태의 쿼리를 함.
 		String q;
-		q = "SELECT problemID FROM " + table + " WHERE " + wherecond.get(0);
+		q = "SELECT problemID FROM " + table + " WHERE ";
+		for(int i=0;i<wherecond.size();i++){
+			if(i!=0)
+				q += " AND ";
+			q += wherecond.elementAt(i);
+		}
+System.out.println(q);
 		try {
+System.out.println(problemID);	
 			resultSet = statement.executeQuery(q);
 			resultSet.next();
 			problemID = (int)resultSet.getObject(1);
+System.out.println(problemID);			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Message msg = new Message();
+			msg.alertMessage(null, "해당 문제가 없습니다.");
+			//e.printStackTrace();
 		}
-		return problemID;
+		finally{
+			return problemID;	
+		}
 	}
 }// Query
 

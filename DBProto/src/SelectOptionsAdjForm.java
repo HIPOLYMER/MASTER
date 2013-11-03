@@ -3,6 +3,9 @@
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -22,7 +25,9 @@ class SelectOptionsAdjForm extends JFrame  {
 	private String large, medium, small;
 
 	// 수정 버튼이 눌리면 채워질 변수들(아직 미정)
-
+	private String problem, addition, keyword, solution;
+	private String choice1, choice2, choice3, choice4;
+	
 	private Vector<String> adjust_phTable;
 	private Vector<String> adjust_pbTable;
 	private String selectWhere;
@@ -190,30 +195,60 @@ class SelectOptionsAdjForm extends JFrame  {
 
 	// 생성자에서 호출되며, 기출 년도, 회차, 유형, 과목을 각 ComboBox에 채워 넣는 함수
 	private void fillInit() {
-
+		Query query =  new Query();
 		Vector<String> selectBasic1 = new Vector<String>();
 		Vector<String> selectBasic2 = new Vector<String>();
-
-		selectBasic1.add(year_CB.getName() + ", " + serial_CB.getName());
-		selectBasic2.add(type_CB.getName() + ", " + subject_CB.getName()+ ", classify" + ", level");
+		ResultSet resultSet;
 
 		//데이터 베이스에 질의
-//		selectBasic1 = Query.doSelects(selectBasic1, bTable1, null);
-//		selectBasic2 = Query.doSelects(selectBasic2, bTable1, null);
-
+		selectBasic1.add(year_CB.getName());
+		resultSet = query.doSelects(selectBasic1, bTable1, null);		
+		selectBasic1.clear();
+		parseQuery(resultSet);
+		selectBasic1.add(serial_CB.getName());
+		resultSet = query.doSelects(selectBasic1, bTable1, null);
+		parseQuery(resultSet);
+		selectBasic2.add(type_CB.getName());
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
+		selectBasic2.clear();
+		parseQuery(resultSet);
+		selectBasic2.add(subject_CB.getName());
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
+		parseQuery(resultSet);
 		//받아온 결과를 파싱 및 ComboBox 에 반영
-		parseQuery();
-
+		parseQuery(resultSet);
+		query.close();
+		query.finalize();
 	}
 
-	private void parseQuery() {
+	private void parseQuery(ResultSet resultSet) {
 		// fillInit에서 읽어온 쿼리를 addItem 하기 전에 각 항목에 맞는 형태로 파싱하기 위한 작업
 		// 파싱을 하면서 곧 바로 addItem 을 하는 것이 편할 것으로 판단 됨.
-		//1.파싱
+		//1. 파싱
 		//2. ComboBox에 저장
 		// year_CB.addItem(" ");
 		// serial_CB.addItem(); 형식
+		try {
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			
+			if(metaData.getColumnName(1).equals("year")){
+				while(resultSet.next())
+					year_CB.addItem((Integer) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("serial")){
+				while(resultSet.next())
+					serial_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("type")){
+				while(resultSet.next())
+					type_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("subject")){
+				while(resultSet.next())
+					subject_CB.addItem((String) resultSet.getObject(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
+
 
 	// 버튼 클릭 이벤트리스너 시작
 	private class ButtonClickListener implements ActionListener, ErrCheck, ClearGUI {
@@ -222,58 +257,98 @@ class SelectOptionsAdjForm extends JFrame  {
 		public void actionPerformed(ActionEvent e) {
 			JButton button = (JButton) e.getSource();
 			if (button.getName() == "selectButton") {
-
-				/*
-				  1. checkDanglingElement(); 로 선택 안 된 항목이 있나 체크
-				  if(에러면) {
-				 		message.alertMessage(button.getRootPane().getParent(), "모든 항목을 입력해야 합니다."); }
-				  else
-				  {
-					  Query query= new Query();
-					  //2현재 까지 선택된 내용을 각각의 변수에 채워넣는다..(SelectOptionsAdjForm 변수 선언부분에 선언된 변수들)
-
-					  year=(int)year_CB.getSelectedItem();
-					  serial=serial_CB.getSelectedItem().toString();
-
-				 	 //makeSelectWhere();
-				 	 //problemID=query.getProblemID(phTable, ajust_phTable);
-				 	 //clearOptions로 화면 초기화
-
-				  	 //3.수정 Form 을 생성 adjustForm = new AdjustProblemForm();
-				  }
-				 */
-
-				adjustForm = new AdjustProblemForm();
+			//1. checkDanglingElement(); 로 선택 안 된 항목이 있나 체크
+				if(checkDanglingElement()==false){ //에러면
+					message.alertMessage(button.getRootPane().getParent(), "모든 항목을 선택 해야 합니다.");
+				}else {
+					Query query= new Query();
+				//2.현재 까지 선택된 내용을 각각의 변수에 채워넣는다..(SelectOptionsAdjForm 변수 선언부분에 선언된 변수들)
+					year = (int)year_CB.getSelectedItem();
+					serial = serial_CB.getSelectedItem().toString();
+					type = type_CB.getSelectedItem().toString();
+					subject = subject_CB.getSelectedItem().toString();
+					if(basic_RB.isSelected() == true){
+						classify = basic_RB.getName();
+					}else if(app_RB.isSelected() == true){
+						classify = app_RB.getName();
+					}else if(calc_RB.isSelected() == true){
+						classify = calc_RB.getName();
+					} 
+					if(high_RB.isSelected() == true){
+						level = high_RB.getName();
+					}else if(normal_RB.isSelected() == true){
+						level = normal_RB.getName();
+					}else if(easy_RB.isSelected() == true){
+						level = easy_RB.getName();
+					}
+					large = large_CB.getSelectedItem().toString();
+					medium =  medium_CB.getSelectedItem().toString();
+					small = small_CB.getSelectedItem().toString();
+System.out.println("메이크셀렉트웨얼" + level);
+					makeSelectWhere();
+				 	problemID=query.getProblemID(phTable, adjust_phTable);
+				 	query.close();
+				 	query.finalize();
+				 	//clearOptions로 화면 초기화
+//이걸 왜함?			clearOptions();
+				 	
+				//3.수정 Form 을 생성
+				 if(problemID!=-1)
+					 adjustForm = new AdjustProblemForm();
+				}
 			}
-
 			if (button.getName() == "adjustButton") {
-
+System.out.println("수정할거당" + problemID);
 				// 1.checkEmpty(); 로 입력 안 된 항목이 있나 체크
 				// 2.만약 에러라면
 				// message.alertMessage(button.getRootPane().getParent(), "입력되지 않은 항목이 있습니다.");
-				// 풀이 는 입력이 안 됐다면 풀이를 입력하지 않을 것인지 물어보는 메시지 상자를 띄우고, 예라면 그냥 넘어가고
-				// 아니오 라면 진행하지 않고 다시 입력을 기다린다.
-
+				if(checkEmpty()==false){
+					message.alertMessage(button.getRootPane().getParent(), "입력되지 않은 항목이 있습니다.");
+//풀이 는 입력이 안 됐다면 풀이를 입력하지 않을 것인지 물어보는 메시지 상자를 띄우고, 예라면 그냥 넘어가고
+// 아니오 라면 진행하지 않고 다시 입력을 기다린다.
+				}
 				// 3.에러가 아니라면 번호, 문제 내용 등을 각 변수에 채워 넣는다.(SelectOptionsInsForm 변수선언 부분에 선언된 변수들)
-				// makeUpdateSet()
-				// Query.doUpdates(phTable, adjust_phTable, problemID);
-				// Query.doUpdates(pbTable, adjust_pbTable, problemID);
-
+				Query query = new Query();
+choice1 = "수정됏나";
+				makeUpdateSet();
+				query.doUpdates(phTable, adjust_phTable, "problemID="+problemID);
+				query.doUpdates(pbTable, adjust_pbTable, "problemID="+problemID);
 				// clearContents() 로 화면 초기화
-
+				query.close();
+				query.finalize();
+				 clearContents();
 			}
 
 			if (button.getName() == "deleteButton") {
 				// 1. Query.doDeletes(pbTable, problemID);
 				// 2. Query.doDeletes(phTable, problemID);
 				// 3. 오류가 없다면 clearContents();
+				Query query = new Query();
+System.out.println("삭제할거당" + problemID);
+				query.doDeletes(phTable, "problemID="+problemID);
+				query.doDeletes(pbTable, "problemID="+problemID);
+				query.close();
+				query.finalize();
 			}
 		}
 		@Override
 		public boolean checkDanglingElement() {
 			// 모든 Option들이 선택 됐는지 ComboBox와 RadioButton 들을 점검
-			return true;
+	//라디오버튼을 선택 안할수가 없지...
+			if((year_CB.getSelectedItem() == null)
+				||(serial_CB.getSelectedItem() == null)
+				||(type_CB.getSelectedItem() == null)
+				||(subject_CB.getSelectedItem() == null)
+				||(large_CB.getSelectedItem() == null)
+				||(medium_CB.getSelectedItem() == null)
+				||(small_CB.getSelectedItem() == null)
+			){
+				return false;
+			}else{
+				return true;
+			}
 		}
+
 
 		@Override
 		public boolean checkEmpty() {
@@ -290,17 +365,40 @@ class SelectOptionsAdjForm extends JFrame  {
 		}
 
 		private void makeUpdateSet() {
-			// 수정 버튼이 눌렸을 때 모든 Option 들과 문제 내용에 맞는 쿼리를 만들어주는 함수
-			// where 조건에는 선택 버튼이 눌렸을 때 구해온 problemID를 사용
+			adjust_pbTable.clear();
+			// 수정 버튼이 눌렸을 때 모든 Option 들과 문제 내용에 맞는 쿼리(SET절)를 만들어주는 함수
 			// adjust_pbTable.add( attrName+"="+value+", " .... 형태로 구성 )
-			// UPDATE pbTable SET adjust_pbTable WHERE "problemID="+problemID;
-
+			// UPDATE pbTable SET adjust_pbTable WHERE "problemID="+problemID;	
+			adjust_pbTable.add("problem=\"" + problem + "\"");
+			adjust_pbTable.add("addition=\"" + addition + "\"");
+			adjust_pbTable.add("choice1=\"" + choice1 + "\"");
+			adjust_pbTable.add("choice2=\"" + choice2 + "\"");
+			adjust_pbTable.add("choice3=\"" + choice3 + "\"");
+			adjust_pbTable.add("choice4=\"" + choice4 + "\"");
+			adjust_pbTable.add("keyword=\"" + keyword + "\"");
+			adjust_pbTable.add("solution=\"" + solution + "\"");
 		}
 
 		private void makeSelectWhere() {
+			adjust_phTable.clear();
 			// 선택 버튼이 눌렸을 때 adjust_phTable 내용을 채워줄 함수.
 			// adjust_phTable은 problemID 를 가지고 오는데 사용된다.
 			// ajust_phTable.add( year_CB.getName()+"="+year+....+ 형태로 구성 )
+//			q = "year=\"" + year + "\" AND serial=\"" + serial + "\" AND "
+//				+ "type=\"" + type + "\" AND subject=\"" + subject + "\" AND "
+//				+ "classify=\"" + classify + "\" AND level=\"" + level + "\" AND large=\"" + large
+//				+ "\" AND medium=\"" + medium + "\" AND small=\"" + small + "\" AND pNum=\"" + pNum +"\"";
+			adjust_phTable.add("year=\"" + year + "\"");
+			adjust_phTable.add("serial=\"" + serial + "\"");
+			adjust_phTable.add("type=\"" + type + "\"");
+			adjust_phTable.add("subject=\"" + subject + "\"");
+			adjust_phTable.add("classify=\"" + classify + "\"");
+			adjust_phTable.add("level=\"" + level + "\"");
+			adjust_phTable.add("large=\"" + large + "\"");
+			adjust_phTable.add("medium=\"" + medium + "\"");
+			adjust_phTable.add("small=\"" + small + "\"");
+			adjust_phTable.add("pNum=\"" + pNum + "\"");
+			
 		}
 
 	}// 버튼 클릭 이벤트 리스너 끝
@@ -308,50 +406,62 @@ class SelectOptionsAdjForm extends JFrame  {
 	// 콤보박스 리스너 시작
 	private class ComboBoxListener implements ActionListener {
 
+		public void set_large(JComboBox<?> combobox) {
+			large_CB.removeAllItems();
+			medium_CB.removeAllItems();
+			small_CB.removeAllItems();
+			
+			sub = combobox.getSelectedItem().toString();
+			
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub);
+//System.out.println("Subject : "+selectWhere);
+			large_items = getLMS.getLarge(classTable, sub, selectWhere);
+			// large_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> large_items_clone = (Vector<String>) large_items.clone();
+			for (String item : large_items_clone) {
+				large_CB.addItem(item);
+			}
+		}
+		public void set_medium(JComboBox<?> combobox) {
+			medium_CB.removeAllItems();
+			small_CB.removeAllItems();
+			L = combobox.getSelectedItem().toString();
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L);
+			medium_items = getLMS.getMedium(classTable, sub, L, selectWhere);
+
+			// medium_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> medium_items_clone = (Vector<String>) medium_items.clone();
+			for (String item : medium_items_clone) {
+				medium_CB.addItem(item);
+			}
+		}
+		public void set_small(JComboBox<?> combobox) {
+			small_CB.removeAllItems();
+			M = combobox.getSelectedItem().toString();
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L, medium_CB.getName(), M);
+			small_items = getLMS.getSmall(classTable, sub, L, M, selectWhere);
+
+			// small_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> small_items_clone = (Vector<String>) small_items.clone();
+			for (String item : small_items_clone) {
+				small_CB.addItem(item);
+			}
+		}
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			JComboBox<?> combobox = (JComboBox<?>) e.getSource();
-
 			// 선택 된 ComboBox 의 종류에 따라 하위 분류를 가지고 오는 작업
-			if (combobox.getName() == "subject") {
-				sub = combobox.getSelectedItem().toString();
-
-				selectWhere = getLMS.getWhere(subject_CB.getName(), sub);
-				large_items = getLMS.getLarge(classTable, sub, selectWhere);
-
-				// large_items 벡터에 있는 개수 만큼 addItem 수행
-				for (String item : large_items) {
-					large_CB.addItem(item);
-				}
-
-			} else if (combobox.getName() == "large") {
-				L = combobox.getSelectedItem().toString();
-
-				selectWhere = getLMS.getWhere(subject_CB.getName(), sub,
-						large_CB.getName(), L);
-				medium_items = getLMS
-						.getMedium(classTable, sub, L, selectWhere);
-
-				// medium_items 벡터에 있는 개수 만큼 addItem 수행
-				for (String item : medium_items) {
-					medium_CB.addItem(item);
-				}
-			} else if (combobox.getName() == "medium") {
-				M = combobox.getSelectedItem().toString();
-				selectWhere = getLMS.getWhere(subject_CB.getName(), sub,
-						large_CB.getName(), L, medium_CB.getName(), M);
-				small_items = getLMS.getSmall(classTable, sub, L, M,
-						selectWhere);
-				// small_items 벡터에 있는 개수 만큼 addItem 수행
-				for (String item : small_items) {
-					small_CB.addItem(item);
-				}
-			} else if (combobox.getName() == "small") {
-
+			if (combobox.getName() == "subject" && !(combobox.getSelectedItem()==null)) {
+				set_large(combobox);
+			} else if (combobox.getName() == "large"  && !(combobox.getSelectedItem()==null)) {
+				set_medium(combobox);
+			} else if (combobox.getName() == "medium"  && !(combobox.getSelectedItem()==null)) {
+				set_small(combobox);
+			}else if (combobox.getName() == "small") {
 				// pNum 채우기
 				setPnumCombo();
-
 			}
 		}//actionPerformed()
 
@@ -363,7 +473,8 @@ class SelectOptionsAdjForm extends JFrame  {
 			//쿼리로 해당 분류에 존재하는 문제 번호를 모두 가져옴
 			maxPnum = query.getPnum(phTable, year, serial, type, subject, large,
 					medium, small);
-
+			query.close();
+			query.finalize();
 			//존재하는 문제 번호만으로 ComboBox를 구성해서 번호 선택에 오류가 없도록 함.
 			for(Integer item : maxPnum)
 			{
@@ -393,7 +504,7 @@ class SelectOptionsAdjForm extends JFrame  {
 
 			deleteButton = new JButton("삭제");
 			deleteButton.setName("deleteButton");
-			adjustButton.addActionListener(new ButtonClickListener());
+			deleteButton.addActionListener(new ButtonClickListener());
 			adjustPane.add(deleteButton);
 
 			setVisible(true);
