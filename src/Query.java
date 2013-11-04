@@ -61,7 +61,7 @@ class Query {
 				+ type + ", subject=" + subject + ", large=" + large
 				+ ", medium=" + medium + ", small=" + small;
 
-		// select MAX(pNum) from table where wherecond GROUPBY year, serial, type, subject, large, medium, small
+		// select pNum from table where wherecond GROUPBY year, serial, type, subject, large, medium, small
 		//위와 같이 쿼리해서 pNum에 결과를 모두 저장해서 리턴
 		return pNum;
 	}

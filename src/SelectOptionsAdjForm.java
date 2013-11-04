@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 class SelectOptionsAdjForm extends JFrame  {
 
@@ -50,6 +51,7 @@ class SelectOptionsAdjForm extends JFrame  {
 
 	// ============AdjustProblemForm GUI 변수들==================//
 	private JPanel adjustPane;
+	private JTextField pNum_TB;
 	private JButton adjustButton, deleteButton;
 
 	// 번호도 텍스트 상자로 보여주고 수정 가능하도록 함.
@@ -173,6 +175,10 @@ class SelectOptionsAdjForm extends JFrame  {
 
 		selectPane.add(etc_P);
 
+		pNum_CB = new JComboBox<Integer>();
+		pNum_CB.setName("pNum");
+		selectPane.add(pNum_CB);
+
 		selectButton = new JButton();
 		selectButton.setText("선택");
 		selectButton.setName("selectButton");
@@ -199,7 +205,7 @@ class SelectOptionsAdjForm extends JFrame  {
 
 		//데이터 베이스에 질의
 		selectBasic1 = Query.doSelects(selectBasic1, bTable1, null);
-		selectBasic2 = Query.doSelects(selectBasic2, bTable1, null);
+		selectBasic2 = Query.doSelects(selectBasic2, bTable2, null);
 
 		//받아온 결과를 파싱 및 ComboBox 에 반영
 		parseQuery();
@@ -237,6 +243,7 @@ class SelectOptionsAdjForm extends JFrame  {
 
 				 	 //makeSelectWhere();
 				 	 //problemID=query.getProblemID(phTable, ajust_phTable);
+				 	 //문제, 보기 등 가져온 내용 채우기
 				 	 //clearOptions로 화면 초기화
 
 				  	 //3.수정 Form 을 생성 adjustForm = new AdjustProblemForm();
@@ -299,7 +306,7 @@ class SelectOptionsAdjForm extends JFrame  {
 
 		private void makeSelectWhere() {
 			// 선택 버튼이 눌렸을 때 adjust_phTable 내용을 채워줄 함수.
-			// adjust_phTable은 problemID 를 가지고 오는데 사용된다.
+			// adjust_phTable은 problemID와 pbTable내용을 가지고 오는데 사용된다.
 			// ajust_phTable.add( year_CB.getName()+"="+year+....+ 형태로 구성 )
 		}
 
@@ -383,9 +390,9 @@ class SelectOptionsAdjForm extends JFrame  {
 					.setLayout(new BoxLayout(adjustPane, BoxLayout.PAGE_AXIS));
 			setContentPane(adjustPane);
 
-			pNum_CB = new JComboBox<Integer>();
-			pNum_CB.setName("pNum");
-			adjustPane.add(pNum_CB);
+			pNum_TB= new JTextField();
+			pNum_TB.setName("pNum");
+			adjustPane.add(pNum_TB);
 
 			adjustButton = new JButton("수정");
 			adjustButton.setName("adjustButton");
