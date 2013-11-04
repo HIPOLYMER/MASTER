@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -25,11 +26,14 @@ import javax.swing.border.TitledBorder;
 
 public class OutFileForm extends JFrame {
 
+	private Dimension resolution;
+	
 	//table 이름들
 	private String phTable, pbTable, bTable1, bTable2, classTable;
-
+	
 	//OutFileForm GUI 변수들
-	private JPanel outfile_P, button_P, top_P;
+	private JScrollPane leftPane_Scr, rightPane_Scr;
+	private JPanel outfile_P, left_P, right_P, button_P, top_P;
 	private JPanel basic_P, persub_P, etc_P;
 	private JTextField totalCount_TB, relatedProblem_TB;
 	private JComboBox<Integer> toSelectCount_CB, year_CB;
@@ -63,6 +67,8 @@ public class OutFileForm extends JFrame {
 
 	OutFileForm()
 	{
+		resolution=Toolkit.getDefaultToolkit().getScreenSize();
+		
 		//동적 생성할 변수 미리 초기화
 		dynamic_P=new Vector<JPanel>();
 		dynamic_Scr=new Vector<JScrollPane>();
@@ -79,6 +85,10 @@ public class OutFileForm extends JFrame {
 
 		//패널 초기화
 		outfile_P= new JPanel();
+		left_P=new JPanel();
+		right_P=new JPanel();
+		leftPane_Scr=new JScrollPane(left_P);
+		rightPane_Scr= new JScrollPane(right_P);
 		button_P= new JPanel();
 		top_P= new JPanel();
 		basic_P = new JPanel();
@@ -132,28 +142,25 @@ public class OutFileForm extends JFrame {
 		//content_P,left, right 설정
 		setBounds(0, 0, 1000, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		outfile_P.setMaximumSize(new Dimension(500, 600));
-		outfile_P.setLayout(new BoxLayout(outfile_P, BoxLayout.LINE_AXIS));
 		setContentPane(outfile_P);
 
+		outfile_P.setMaximumSize(new Dimension((int) resolution.getWidth(), (int)resolution.getHeight()));
+		outfile_P.setLayout(new BoxLayout(outfile_P, BoxLayout.LINE_AXIS));
 
-		JPanel left_P, right_P;
-		left_P=new JPanel();
-		right_P= new JPanel();
-		left_P.setMaximumSize(new Dimension(500, 600));
+		//left, right panel 에 스크롤바 붙이기
+		left_P.setMaximumSize(new Dimension((int) resolution.getWidth(), (int)resolution.getHeight()));
 		left_P.setLayout(new BoxLayout(left_P, BoxLayout.PAGE_AXIS));
+		leftPane_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		leftPane_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-		right_P.setMaximumSize(new Dimension(500, 600));
+
+		right_P.setMaximumSize(new Dimension((int) resolution.getWidth(), (int)resolution.getHeight()));
 		right_P.setLayout(new BoxLayout(right_P, BoxLayout.PAGE_AXIS));
-		basic_P.setLayout(new BoxLayout(basic_P, BoxLayout.PAGE_AXIS));
-		persub_P.setLayout(new BoxLayout(persub_P, BoxLayout.PAGE_AXIS));
-
-		outfile_P.add(left_P);
-		outfile_P.add(right_P);
+		rightPane_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		rightPane_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		//top_P
-		top_P.setMaximumSize(new Dimension(500, 50));
+		top_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 		totalCount_TB.setPreferredSize(new Dimension(30, 25));
 		totalCount_TB.setName("totalCount_TB");
 		totalCount_TB.setEditable(false);
@@ -166,12 +173,13 @@ public class OutFileForm extends JFrame {
 		top_P.add(toSelectCount_CB);
 
 		//basic_P
+		basic_P.setLayout(new BoxLayout(basic_P, BoxLayout.PAGE_AXIS));
 		JPanel basicLabel_P= new JPanel();
 		JPanel basicCombo_P= new JPanel();
 
-		basic_P.setMaximumSize(new Dimension(500, 100));
+		basic_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 100));
 		basic_P.setLayout(new BoxLayout(basic_P, BoxLayout.Y_AXIS));
-		basicLabel_P.setMaximumSize(new Dimension(500, 30));
+		basicLabel_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 30));
 		basic_P.add(basicLabel_P);
 		basic_P.add(basicCombo_P);
 
@@ -208,7 +216,7 @@ public class OutFileForm extends JFrame {
 		basicCombo_P.add(subject_CB);
 
 		//etc_P
-		etc_P.setMaximumSize(new Dimension(500, 100));
+		etc_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 100));
 		etc_P.setPreferredSize(new Dimension(500, 150));
 
 		JPanel class_P, level_P, solution_P;
@@ -237,34 +245,37 @@ public class OutFileForm extends JFrame {
 		//right
 		JPanel listBtn_P;
 		listBtn_P=new JPanel();
-		listBtn_P.setMaximumSize(new Dimension(500, 50));
+		listBtn_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 
-		selectedList_Btn.setMaximumSize(new Dimension(400, 30));
+		selectedList_Btn.setMaximumSize(new Dimension((int)resolution.getWidth(), 30));
 		selectedList_Btn.setPreferredSize(new Dimension(355, 30));
 		selectedList_Btn.setName("selectedList_Btn");
 		selectedList_Btn.addActionListener(new ButtonClickListener());
 		listBtn_P.add(selectedList_Btn);
+
+		//persub
+		persub_P.setLayout(new BoxLayout(persub_P, BoxLayout.PAGE_AXIS));
 
 		JPanel large_P, medium_P, small_P;
 		large_P=new JPanel();
 		medium_P=new JPanel();
 		small_P=new JPanel();
 
-		large_P.setMaximumSize(new Dimension(500, 50));
+		large_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 		large_CB.setPreferredSize(new Dimension(400, 35));
 		large_CB.setName("large");
 		large_CB.addActionListener(new ComboBoxListener());
 		large_P.add(large_L);
 		large_P.add(large_CB);
 
-		medium_P.setMaximumSize(new Dimension(500, 50));
+		medium_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 		medium_CB.setPreferredSize(new Dimension(400, 35));
 		medium_CB.setName("medium");
 		medium_CB.addActionListener(new ComboBoxListener());
 		medium_P.add(medium_L);
 		medium_P.add(medium_CB);
 
-		small_P.setMaximumSize(new Dimension(500, 50));
+		small_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 		small_CB.setPreferredSize(new Dimension(400, 35));
 		small_CB.setName("small");
 		small_P.add(small_L);
@@ -278,9 +289,14 @@ public class OutFileForm extends JFrame {
 
 		//relatedBox
 		Box related_Box = Box.createHorizontalBox();
-		related_Box.setMaximumSize(new Dimension(350, 50));
+		related_Box.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 		related_Box.setPreferredSize(new Dimension(300, 50));
-
+		
+		Component related_glue = Box.createGlue();
+		related_glue.setMaximumSize(new Dimension(15, 32767));
+		related_glue.setPreferredSize(new Dimension(10, 50));
+		related_Box.add(related_glue);
+		
 		JLabel label_3 = new JLabel("해당되는 문제 수");
 		related_L.setPreferredSize(new Dimension(100, 18));
 		related_Box.add(related_L);
@@ -291,13 +307,18 @@ public class OutFileForm extends JFrame {
 		relatedProblem_TB.setEditable(false);
 		related_Box.add(relatedProblem_TB);
 
-		Component related_glue = Box.createGlue();
-		related_Box.add(related_glue);
+		Component related_glue_1 = Box.createGlue();
+		related_Box.add(related_glue_1);
 
 		//button
 		Box button_Box = Box.createHorizontalBox();
-		button_Box.setMaximumSize(new Dimension(350, 100));
-
+		button_Box.setMaximumSize(new Dimension((int)resolution.getWidth(), 100));
+		
+		Component button_glue = Box.createGlue();
+		button_glue.setMaximumSize(new Dimension(10, 32767));
+		button_glue.setPreferredSize(new Dimension(5, 50));
+		button_Box.add(button_glue);
+		
 		add_Btn.setName("add_Btn");
 		add_Btn.addActionListener(new ButtonClickListener());
 		add_Btn.setMinimumSize(new Dimension(52, 50));
@@ -306,7 +327,7 @@ public class OutFileForm extends JFrame {
 		button_Box.add(add_Btn);
 
 		Component button_glue_1 = Box.createGlue();
-		button_glue_1.setMaximumSize(new Dimension(60, 32767));
+		button_glue_1.setMaximumSize(new Dimension(30, 32767));
 		button_Box.add(button_glue_1);
 
 
@@ -329,8 +350,10 @@ public class OutFileForm extends JFrame {
 		right_P.add(related_Box);
 		right_P.add(button_Box);
 
-		outfile_P.add(left_P);
-		outfile_P.add(right_P);
+		outfile_P.add(leftPane_Scr);
+		outfile_P.add(rightPane_Scr);
+		//outfile_P.add(left_P);
+		//outfile_P.add(right_P);
 
 		this.setTitle("파일출력");
 		this.pack();
@@ -414,14 +437,15 @@ public class OutFileForm extends JFrame {
 
 			temp_P.setPreferredSize(new Dimension(1000,60));
 			tempScroll_P.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-			tempScroll_P.setPreferredSize(new Dimension(900,50));
-			temp_TA.setSize(900,40);
-			temp_Btn.setPreferredSize(new Dimension(70, 30));
+			tempScroll_P.setPreferredSize(new Dimension(850,50));
+			temp_TA.setSize(850,50);
+			temp_Btn.setPreferredSize(new Dimension(70, 20));
+			temp_Btn.setBackground(Color.RED);
 			temp_Btn.setText("DEL");
-			
+
 			temp_P.add(tempScroll_P);
 			temp_P.add(temp_Btn);
-			
+
 			dynamic_P.add(temp_P);
 			dynamic_Scr.add(tempScroll_P);
 			dynamic_TA.add(temp_TA);
@@ -429,7 +453,7 @@ public class OutFileForm extends JFrame {
 		}
 
 	}//ButtonClickListener
-	
+
 	//선택 된 리스트에 추가됐을 때
 	private class ListDeleteListener implements ActionListener
 	{
@@ -495,43 +519,44 @@ public class OutFileForm extends JFrame {
 
 			clear_Btn=new JButton("전체 삭제");
 			clear_Btn.setName("clear_Btn");
+			clear_Btn.setBackground(Color.RED);
 			clear_Btn.addActionListener(new ButtonClickListener());
 
 			//=============멤버 변수 초기화 끝=============//
 
-			setBounds(0, 0, 1000, 400);
+			setBounds(0, 0, 1000, 500);
 			listBody_P.setLayout(new BoxLayout(listBody_P, BoxLayout.PAGE_AXIS));
 			setContentPane(listBody_P);
-
-			count_P.setMaximumSize(new Dimension(1000, 100));
+			
+			count_P.setPreferredSize(new Dimension(1000,100));
+			count_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 200));
 			selectedCount_TB.setMaximumSize(new Dimension(50, 30));
 			selectedCount_TB.setEditable(false);
 			selectedCount_TB.setColumns(5);
 
 			count_P.add(count_L);
 			count_P.add(selectedCount_TB);
-			count_glue_1.setPreferredSize(new Dimension(810, 20));
+			count_P.add(complete_Btn);
+			count_glue_1.setPreferredSize(new Dimension(630, 20));
 			count_P.add(count_glue_1);
-
+			count_P.add(clear_Btn);
+			
+			
 			list_P.setLayout(new BoxLayout(list_P, BoxLayout.PAGE_AXIS));
-			listScroll_P.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			listScroll_P.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 			listScroll_P.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
+			
+			list_P.add(count_P);
 			//동적으로 생성된 리스트를 list_P에 붙인다.
 			for(int i=0; i<dynamic_P.size(); i++){
 				list_P.add(dynamic_P.get(i));
 			}
-
-			listButton_P.setMaximumSize(new Dimension(1000, 200));
-			listButton_P.add(complete_Btn);
-			listButton_P.add(clear_Btn);
-			listButton_glue.setPreferredSize(new Dimension(833, 20));
-			listButton_P.add(listButton_glue);
-
-			listBody_P.add(count_P);
+			
+			
+			//listBody_P.add(countScroll_P);
 			listBody_P.add(listScroll_P);
-			listBody_P.add(listButton_P);
-
+			
+			pack();
 			setVisible(true);
 
 
