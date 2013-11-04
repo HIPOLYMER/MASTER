@@ -543,7 +543,7 @@ public class OutFileForm extends JFrame {
 			
 			
 			list_P.setLayout(new BoxLayout(list_P, BoxLayout.PAGE_AXIS));
-			listScroll_P.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			listScroll_P.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			listScroll_P.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			
 			list_P.add(count_P);
