@@ -186,10 +186,10 @@ public class OutFileForm extends JFrame {
 
 		//top_P
 		top_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
-		totalCount_TB.setPreferredSize(new Dimension(30, 25));
+		totalCount_TB.setPreferredSize(new Dimension(50, 25));
 		totalCount_TB.setName("totalCount_TB");
 		totalCount_TB.setEditable(false);
-		toSelectCount_CB.setPreferredSize(new Dimension(50, 25));
+		toSelectCount_CB.setPreferredSize(new Dimension(60, 25));
 		toSelectCount_CB.setName("toSelectCount_CB");
 
 		//basic_P
@@ -406,11 +406,14 @@ public class OutFileForm extends JFrame {
 				dynamic_TA.removeAllElements();
 				dynamic_Scr.removeAllElements();
 				dynamic_P.removeAllElements();
-
+				
+				//코딩시 제대로 지워지는지 확인 용.. 배포시에 필요없음
+				System.out.println(dynamic_P.isEmpty());
+				
 				//제일 윗 부분은 재 생성
 				list_P.add(count_P);
 				list_P.repaint();
-
+				
 				count=0;
 			}
 		}
@@ -490,9 +493,13 @@ public class OutFileForm extends JFrame {
 					dynamic_P.remove(i);
 					list_P.remove(i+1);
 					count-=1;
+					//코딩시 확인용
 					System.out.println(count);
 				}
 				list_P.revalidate();
+				
+				//코딩시 확인용
+				System.out.println(dynamic_P.isEmpty());
 			}
 		}
 
@@ -526,7 +533,7 @@ public class OutFileForm extends JFrame {
 			listButton_glue = Box.createGlue();
 
 			selectedCount_TB=new JTextField();
-
+	
 			complete_Btn=new JButton("완료");
 			complete_Btn.setName("complete_Btn");
 			complete_Btn.addActionListener(new ButtonClickListener());
@@ -564,7 +571,7 @@ public class OutFileForm extends JFrame {
 			for(int i=0; i<dynamic_P.size(); i++){
 				list_P.add(dynamic_P.get(i));
 			}
-
+			
 			listBody_P.add(listScroll_P);
 
 			pack();
