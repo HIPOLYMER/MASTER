@@ -127,7 +127,7 @@ class SelectOptionsInsForm extends JFrame {
 		this.setTitle("입력할 분류 선택");
 
 		// content_P 설정
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 600, 350);
 		select_P.setLayout(new BoxLayout(select_P, BoxLayout.PAGE_AXIS));
 		setContentPane(select_P);

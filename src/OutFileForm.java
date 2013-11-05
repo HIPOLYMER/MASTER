@@ -4,19 +4,16 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.util.Vector;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -167,7 +164,7 @@ public class OutFileForm extends JFrame {
 
 		//content_P,left, right 설정
 		setBounds(0, 0, 1000, 600);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setContentPane(outfile_P);
 
 		outfile_P.setMaximumSize(new Dimension((int) resolution.getWidth(), (int)resolution.getHeight()));
@@ -240,12 +237,12 @@ public class OutFileForm extends JFrame {
 		basic_P.add(basicLabel_P);
 		basic_P.add(basicCombo_P);
 		basicLabel_P.add(year_L);
-		basicCombo_P.add(year_CB);
 		basicLabel_P.add(serial_L);
-		basicCombo_P.add(serial_CB);
 		basicLabel_P.add(type_L);
-		basicCombo_P.add(type_CB);
 		basicLabel_P.add(subject_L);
+		basicCombo_P.add(year_CB);
+		basicCombo_P.add(serial_CB);
+		basicCombo_P.add(type_CB);
 		basicCombo_P.add(subject_CB);
 
 		class_P.add(basic_CK);
@@ -406,14 +403,14 @@ public class OutFileForm extends JFrame {
 				dynamic_TA.removeAllElements();
 				dynamic_Scr.removeAllElements();
 				dynamic_P.removeAllElements();
-				
+
 				//코딩시 제대로 지워지는지 확인 용.. 배포시에 필요없음
 				System.out.println(dynamic_P.isEmpty());
-				
+
 				//제일 윗 부분은 재 생성
 				list_P.add(count_P);
 				list_P.repaint();
-				
+
 				count=0;
 			}
 		}
@@ -497,7 +494,7 @@ public class OutFileForm extends JFrame {
 					System.out.println(count);
 				}
 				list_P.revalidate();
-				
+
 				//코딩시 확인용
 				System.out.println(dynamic_P.isEmpty());
 			}
@@ -533,7 +530,7 @@ public class OutFileForm extends JFrame {
 			listButton_glue = Box.createGlue();
 
 			selectedCount_TB=new JTextField();
-	
+
 			complete_Btn=new JButton("완료");
 			complete_Btn.setName("complete_Btn");
 			complete_Btn.addActionListener(new ButtonClickListener());
@@ -571,7 +568,7 @@ public class OutFileForm extends JFrame {
 			for(int i=0; i<dynamic_P.size(); i++){
 				list_P.add(dynamic_P.get(i));
 			}
-			
+
 			listBody_P.add(listScroll_P);
 
 			pack();

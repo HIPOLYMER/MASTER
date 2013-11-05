@@ -16,8 +16,8 @@ public class DBProto {
 
 		//SelectOptionsInsForm optionInsForm = new SelectOptionsInsForm();
 		//SelectOptionsAdjForm optionAdjForm = new SelectOptionsAdjForm();
-		
-		OutFileForm printFile = new OutFileForm();
+		//OutFileForm printFile = new OutFileForm();
+		MainForm mainForm=new MainForm();
 	}
 
 }
