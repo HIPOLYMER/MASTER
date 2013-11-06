@@ -52,23 +52,7 @@ public class OutFileForm extends JFrame {
 	Component related_glue,  related_glue_1,  button_glue,  button_glue_1,  button_glue_2;
 	Box button_Box,  related_Box;
 
-	//ProblemListForm GUI 변수들
-	private ProblemListForm plist;
-	private JPanel listBody_P, list_P, count_P,  listButton_P;
-	private JTextField selectedCount_TB;
-	private JButton complete_Btn, clear_Btn ;
-	private JLabel count_L;
-	private Component count_glue_1, listButton_glue;
-	private JScrollPane  listScroll_P;
-
-	//problemList 에 동적 생성 될 변수들(초기화는 OutFileForm 클래스 내부에서 미리 해둔다.)
-	private Vector<JPanel> dynamic_P;
-	private Vector<JScrollPane> dynamic_Scr;
-	private Vector<JButton> dynamic_Btn;
-	private Vector<JTextArea> dynamic_TA;
-
-	//동적 생성에 부가적으로 필요한 변수들
-	private int count; //리스트가 하나 생성되면 +1 삭제되면 -1
+	
 
 	OutFileForm()
 	{
@@ -511,7 +495,24 @@ public class OutFileForm extends JFrame {
 		}
 
 	}
+	//ProblemListForm GUI 변수들
+	private ProblemListForm plist;
+	private JPanel listBody_P, list_P, count_P,  listButton_P;
+	private JTextField selectedCount_TB;
+	private JButton complete_Btn, clear_Btn ;
+	private JLabel count_L;
+	private Component count_glue_1, listButton_glue;
+	private JScrollPane  listScroll_P;
 
+	//problemList 에 동적 생성 될 변수들(초기화는 OutFileForm 클래스 내부에서 미리 해둔다.)
+	private Vector<JPanel> dynamic_P;
+	private Vector<JScrollPane> dynamic_Scr;
+	private Vector<JButton> dynamic_Btn;
+	private Vector<JTextArea> dynamic_TA;
+
+	//동적 생성에 부가적으로 필요한 변수들
+	private int count; //리스트가 하나 생성되면 +1 삭제되면 -1
+		
 	private class ProblemListForm extends JFrame
 	{
 

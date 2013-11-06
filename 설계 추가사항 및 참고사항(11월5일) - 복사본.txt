@@ -1,0 +1,9 @@
+MainForm 추가
+이제 모든 하위 기능은 MainForm의 버튼을 통해서 새로운 Form 이 열려 실행된다.
+
+
+AdvancedRTFEditorKit 사용할 수 있는 jar파일을 구글링을 통해 받았음.
+링크 : http://java-sl.com/advanced_rtf_editor_kit.html
+
+jar파일 import 하는 법
+링크: http://annehouse.tistory.com/387

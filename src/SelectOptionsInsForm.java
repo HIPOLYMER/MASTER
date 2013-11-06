@@ -1,9 +1,16 @@
 
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -11,16 +18,30 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+
+import rtf.AdvancedRTFEditorKit;
+import rtf.writer.RTFWriter;
+import sl.docx.DocxEditorKit;
+import sl.docx.DocxDocument;
+import sl.docx.writer.DocxWriter;
+
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.rtf.RTFEditorKit;
+import javax.swing.text.StyledDocument;
 
 class SelectOptionsInsForm extends JFrame {
 
@@ -62,15 +83,8 @@ class SelectOptionsInsForm extends JFrame {
 	private JButton select_Btn;
 	private JLabel year_L, serial_L, type_L, subject_L;
 	private JLabel large_L, medium_L, small_L;
-	private JLabel classification_L, level_L;
 
-	private JScrollBar  combo_Scrb;
-
-	// ============InsertProblemForm GUI 변수들==================//
-	private JPanel insert_P;
-	private JTextField pNum_TB;
-	private JButton insert_Btn;
-
+	
 	// RTF로 구성 된 텍스트 상자와 답, 풀이 들을 표시할 RadioButton 과 CheckBox가 들어 갈 자리
 
 	SelectOptionsInsForm() {
@@ -118,16 +132,12 @@ class SelectOptionsInsForm extends JFrame {
 		large_L=new JLabel("대 분류");
 		medium_L=new JLabel("중 분류");
 		small_L=new JLabel("소 분류");
-		classification_L=new JLabel("구분");
-		level_L=new JLabel("난이도");
-		combo_Scrb= new JScrollBar ();
-
+	
 		// 멤버 변수들 초기화 끝
 
 		this.setTitle("입력할 분류 선택");
 
 		// content_P 설정
-		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 600, 350);
 		select_P.setLayout(new BoxLayout(select_P, BoxLayout.PAGE_AXIS));
 		setContentPane(select_P);
@@ -138,26 +148,22 @@ class SelectOptionsInsForm extends JFrame {
 		year_CB = new JComboBox<Integer>();
 		year_CB.setPreferredSize(new Dimension(100, 30));
 		year_CB.setName("year");
-		year_CB.add(combo_Scrb);
 		basicCombo_P.add(year_CB);
 
 		serial_CB = new JComboBox<String>();
 		serial_CB.setPreferredSize(new Dimension(80, 30));
 		serial_CB.setName("serial");
-		serial_CB.add(combo_Scrb);
 		basicCombo_P.add(serial_CB);
 
 		type_CB = new JComboBox<String>();
 		type_CB.setPreferredSize(new Dimension(80, 30));
 		type_CB.setName("type");
-		type_CB.add(combo_Scrb);
 		basicCombo_P.add(type_CB);
 
 		subject_CB = new JComboBox<String>();
 		subject_CB.setPreferredSize(new Dimension(100, 30));
 		subject_CB.setName("subject");
 		subject_CB.addActionListener(new ComboBoxListener());
-		subject_CB.add(combo_Scrb);
 		basicCombo_P.add(subject_CB);
 
 		//label
@@ -196,7 +202,6 @@ class SelectOptionsInsForm extends JFrame {
 		large_CB = new JComboBox<String>();
 		large_CB.setPreferredSize(new Dimension(400, 35));
 		large_CB.setName("large");
-		large_CB.add(combo_Scrb);
 		large_CB.addActionListener(new ComboBoxListener());
 
 		large_P.setMaximumSize(new Dimension(500, 70));
@@ -206,7 +211,6 @@ class SelectOptionsInsForm extends JFrame {
 		medium_CB = new JComboBox<String>();
 		medium_CB.setPreferredSize(new Dimension(400, 35));
 		medium_CB.setName("medium");
-		medium_CB.add(combo_Scrb);
 		medium_CB.addActionListener(new ComboBoxListener());
 
 		medium_P.setMaximumSize(new Dimension(500, 70));
@@ -216,7 +220,6 @@ class SelectOptionsInsForm extends JFrame {
 		small_CB = new JComboBox<String>();
 		small_CB.setPreferredSize(new Dimension(400, 35));
 		small_CB.setName("small");
-		small_CB.add(combo_Scrb);
 
 		small_P.add(small_L);
 		small_P.add(small_CB);
@@ -372,7 +375,27 @@ class SelectOptionsInsForm extends JFrame {
 				// Query.doInserts(pbTable, insert_pbTable);
 
 				// clearContents() 로 화면 초기화
+				//System.out.println(insertForm.problem_TA.getText());
 
+				StyledDocument doc =(StyledDocument) problem_TA.getDocument();
+				RTFWriter rtf_wr= new RTFWriter(doc);
+				try {
+					System.out.println(doc.getText(0, doc.getLength()));
+				} catch (BadLocationException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				/*
+				try {
+					rtf_wr.write("rtftest.rtf");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				*/
+
+				// Load an RTF file into the editor
 			}
 		}//actionPerformed()
 		@Override
@@ -452,24 +475,272 @@ class SelectOptionsInsForm extends JFrame {
 
 	}// 콤보 박스 리스너 끝
 
+	// ============InsertProblemForm GUI 변수들==================//
+
+	private JPanel insert_P, north_P, problem_P, addition_P ;
+	private JPanel example_P, exam1_P, exam2_P, exam3_P, exam4_P;
+	private JPanel explain_P, solution_P, solexam_P;
+	private JTextField pNum_TB;
+	private JButton insert_Btn;
+	private JEditorPane problem_TA, addition_TA, exam1_TA, exam2_TA, exam3_TA, exam4_TA;
+	private JEditorPane explainK_TA, explainF_TA;
+	private RTFEditorKit prob_kit, addi_kit, exam1_kit, exam2_kit, exam3_kit, exam4_kit;
+	private RTFEditorKit expK_kit, expF_kit;
+	private StyledDocument prob_StyDoc, addi_StyDoc, exam1_StyDoc, exam2_StyDoc, exam3_StyDoc, exam4_StyDoc;
+	private StyledDocument expK_StyDoc, expF_StyDoc;
+	private JScrollPane  insert_Scr, problem_Scr, addition_Scr, exam1_Scr, exam2_Scr, exam3_Scr, exam4_Scr;
+	private JScrollPane explainK_Scr, explainF_Scr;
+	private JRadioButton solexam1_RB, solexam2_RB, solexam3_RB, solexam4_RB;
+	private ButtonGroup solution_G;
+	private Component north_glue, solution_glue;
 	// 문제 입력 Form 시작
 	private class InsertProblemForm extends JFrame {
 
 		InsertProblemForm() {
-			pNum_TB = new JTextField();
+
+			//==================	멤버 변수 초기화 =================//
+
+			//패널 초기화
 			insert_P = new JPanel();
+			north_P = new JPanel();
+			problem_P = new JPanel();
+			addition_P = new JPanel();
+			example_P = new JPanel();
+			exam1_P = new JPanel();
+			exam2_P = new JPanel();
+			exam3_P = new JPanel();
+			exam4_P = new JPanel();
+			explain_P = new JPanel();
+			solution_P= new JPanel();
+			solexam_P = new JPanel();
+
+			pNum_TB = new JTextField();
 			insert_Btn = new JButton("입력");
 
-			setBounds(0, 0, 500, 600);
+			//EditorPane
+			problem_TA= new JEditorPane();
+			addition_TA= new JEditorPane();
+			exam1_TA= new JEditorPane();
+			exam2_TA= new JEditorPane();
+			exam3_TA= new JEditorPane();
+			exam4_TA= new JEditorPane();
+			explainK_TA= new JEditorPane();
+			explainF_TA= new JEditorPane();
+
+			//RTFEditorKit
+			prob_kit=new RTFEditorKit();
+			addi_kit=new RTFEditorKit();
+			exam1_kit=new RTFEditorKit();
+			exam2_kit=new RTFEditorKit();
+			exam3_kit=new RTFEditorKit();
+			exam4_kit=new RTFEditorKit();
+			expK_kit=new RTFEditorKit();
+			expF_kit=new RTFEditorKit();
+
+			//StyledDocument
+			prob_StyDoc = (StyledDocument)(prob_kit.createDefaultDocument());
+			addi_StyDoc = (StyledDocument)(addi_kit.createDefaultDocument());
+			exam1_StyDoc= (StyledDocument)(exam1_kit.createDefaultDocument());
+			exam2_StyDoc= (StyledDocument)(exam2_kit.createDefaultDocument());
+			exam3_StyDoc=(StyledDocument)(exam3_kit.createDefaultDocument());
+			exam4_StyDoc= (StyledDocument)(exam4_kit.createDefaultDocument());
+			expK_StyDoc= (StyledDocument)(expK_kit.createDefaultDocument());
+			expF_StyDoc= (StyledDocument)(expF_kit.createDefaultDocument());
+
+			//JScrollPane
+			insert_Scr= new JScrollPane(insert_P);
+			problem_Scr= new JScrollPane(problem_TA);
+			addition_Scr= new JScrollPane(addition_TA);
+			exam1_Scr= new JScrollPane(exam1_TA);
+			exam2_Scr= new JScrollPane(exam2_TA);
+			exam3_Scr= new JScrollPane(exam3_TA);
+			exam4_Scr= new JScrollPane(exam4_TA);
+			explainK_Scr= new JScrollPane(explainK_TA);
+			explainF_Scr= new JScrollPane(explainF_TA);
+
+			//radiobutton
+			solexam1_RB = new JRadioButton("가");
+			solexam2_RB = new JRadioButton("나");
+			solexam3_RB = new JRadioButton("라");
+			solexam4_RB = new JRadioButton("다");
+			solution_G= new ButtonGroup();
+
+			//글루
+			north_glue = Box.createGlue();
+			solution_glue = Box.createGlue();
+
+			//==================	멤버 변수 초기화 끝 =================//
+
+			setBounds(0, 0, 900, 1200);
+			this.getContentPane().add(insert_Scr);
 			insert_P.setLayout(new BoxLayout(insert_P, BoxLayout.PAGE_AXIS));
-			setContentPane(insert_P);
+			insert_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			insert_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+			//==north_P
+			north_P.setPreferredSize(new Dimension(850, 70));
+			north_P.setMaximumSize(new Dimension(900, 200));
+
+			//번호 텍스트 상자
 			pNum_TB.setName("pNum");
+			pNum_TB.setMinimumSize(new Dimension(5, 30));
+			pNum_TB.setMaximumSize(new Dimension(5, 40));
+			pNum_TB.setPreferredSize(new Dimension(5, 60));
+			pNum_TB.setBorder(new TitledBorder(null, "번호", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
+			pNum_TB.setColumns(5);
 
+			//글루
+			north_glue.setPreferredSize(new Dimension(640, 30));
+
+			//입력 버튼
 			insert_Btn.setName("insert_Btn");
+			insert_Btn.setPreferredSize(new Dimension(70, 50));
 			insert_Btn.addActionListener(new ButtonClickListener());
-			insert_P.add(insert_Btn);
 
+			//==문제
+			problem_P.setMaximumSize(new Dimension(820, 100));
+			problem_TA.setName("problem");
+			problem_TA.setEditorKit(prob_kit);
+			problem_TA.setDocument(prob_StyDoc);
+			problem_TA.setBorder(new TitledBorder(null, "문제", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			problem_TA.setPreferredSize(new Dimension(800, 100));
+			problem_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+			problem_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+
+			//==추가사항
+			addition_P.setMaximumSize(new Dimension(820, 400));
+			addition_TA.setName("addition");
+			addition_TA.setEditorKit(addi_kit);
+			addition_TA.setDocument(addi_StyDoc);
+			addition_TA.setBorder(new TitledBorder(null, "추가사항", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			addition_TA.setPreferredSize(new Dimension(800, 400));
+			addition_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			addition_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+			//==보기
+			example_P.setMaximumSize(new Dimension(840, 500));
+			example_P.setBorder(new TitledBorder(null, "보기", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
+			example_P.setLayout(new BoxLayout(example_P, BoxLayout.Y_AXIS));
+
+			//보기1
+			exam1_TA.setName("choice1");
+			exam1_TA.setEditorKit(exam1_kit);
+			exam1_TA.setDocument(exam1_StyDoc);
+			exam1_TA.setBorder(new TitledBorder(null, "가", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			exam1_TA.setPreferredSize(new Dimension(800, 80));
+			exam1_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			exam1_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+
+			//보기2
+			exam2_TA.setName("choice2");
+			exam2_TA.setEditorKit(exam2_kit);
+			exam2_TA.setDocument(exam2_StyDoc);
+			exam2_TA.setBorder(new TitledBorder(null, "나", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			exam2_TA.setPreferredSize(new Dimension(800, 80));
+			exam2_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			exam2_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+
+			//보기3
+			exam3_TA.setName("choice3");
+			exam3_TA.setEditorKit(exam3_kit);
+			exam3_TA.setDocument(exam3_StyDoc);
+			exam3_TA.setBorder(new TitledBorder(null, "다", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			exam3_TA.setPreferredSize(new Dimension(800, 80));
+			exam3_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			exam3_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+			//보기4
+			exam4_TA.setName("choice4");
+			exam4_TA.setEditorKit(exam4_kit);
+			exam4_TA.setDocument(exam4_StyDoc);
+			exam4_TA.setBorder(new TitledBorder(null, "라", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			exam4_TA.setPreferredSize(new Dimension(800, 80));
+			exam4_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			exam4_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+			//==풀이
+			explain_P.setMaximumSize(new Dimension(850, 300));
+			explain_P.setPreferredSize(new Dimension(850, 300));
+			explain_P.setLayout(new BoxLayout(explain_P, BoxLayout.Y_AXIS));
+			explain_P.setBorder(new TitledBorder(null, "풀이", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+			//키워드 풀이
+			explainK_TA.setName("keyword");
+			explainK_TA.setEditorKit(expK_kit);
+			explainK_TA.setDocument(expK_StyDoc);
+			explainK_TA.setMaximumSize(new Dimension(830, 50));
+			explainK_TA.setPreferredSize(new Dimension(830, 50));
+			explainK_TA.setBorder(new TitledBorder(null, "Keyword", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			explainK_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			explainK_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+			//전체 풀이
+			explainF_TA.setName("full");
+			explainF_TA.setEditorKit(expF_kit);
+			explainF_TA.setDocument(expF_StyDoc);
+			explainF_TA.setMaximumSize(new Dimension(830, 200));
+			explainF_TA.setPreferredSize(new Dimension(830, 200));
+			explainF_TA.setBorder(new TitledBorder(null, "Full", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			explainF_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			explainF_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+			//==답
+			solution_P.setBorder(new EmptyBorder(0, 0, 0, 0));
+			solexam_P.setBorder(new TitledBorder(null, "답", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+			solution_glue.setPreferredSize(new Dimension(620, 50));
+
+			//==컴포넌트 add관계
+
+			//north_P
+			north_P.add(pNum_TB);
+			north_P.add(north_glue);
+			north_P.add(insert_Btn);
+
+			//problem
+			problem_P.add( problem_Scr);
+			addition_P.add(addition_Scr);
+
+			//example
+			exam1_P.add(exam1_Scr);
+			exam2_P.add(exam2_Scr);
+			exam3_P.add(exam3_Scr);
+			exam4_P.add(exam4_Scr);
+
+			example_P.add(exam1_P);
+			example_P.add(exam2_P);
+			example_P.add(exam3_P);
+			example_P.add(exam4_P);
+
+			//explain
+			explain_P.add(explainK_Scr);
+			explain_P.add(explainF_Scr);
+
+			//solution
+			solution_G.add(solexam1_RB);
+			solution_G.add(solexam2_RB);
+			solution_G.add(solexam3_RB);
+			solution_G.add(solexam4_RB);
+
+			solexam_P.add(solexam1_RB);
+			solexam_P.add(solexam2_RB);
+			solexam_P.add(solexam3_RB);
+			solexam_P.add(solexam4_RB);
+			solution_P.add(solexam_P);
+			solution_P.add(solution_glue);
+
+			//contentPane 에 각 패널 추가
+			insert_P.add(north_P);
+			insert_P.add(problem_P);
+			insert_P.add(addition_P);
+			insert_P.add(example_P);
+			insert_P.add(explain_P);
+			insert_P.add(solution_P);
+			
 			setVisible(true);
 		}
 
