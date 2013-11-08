@@ -408,12 +408,139 @@ VALUES ("도시개발론","5. 도시개발의 수법","5. 부동산금융","3. 민관합동의 부동산�
 
 
 -- 4과목 
---INSERT INTO classification(subject,large,medium,small) 
---VALUES ("국토 및 지역계획","","","");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","1. 국토 및 지역계획의 개념 및 필요성","1. 국토 및 지역계획의 개념");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","1. 국토 및 지역계획의 개념 및 필요성","2. 국토 및 지역계획의 성격");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","1. 국토 및 지역계획의 개념 및 필요성","3. 국토 및 지역계획과 타 계획과의 관계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","1. 국토 및 지역계획의 개념 및 필요성","4. 국토 및 지역계획의 필요성");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","2. 유형과 성격","1. 유형");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","2. 유형과 성격","2. 유형별 성격");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","2. 유형과 성격","3. 국토 및 지역계획의 특징과 영역");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","3. 국토 및 지역계획의 역사적 전개","1. 문제의 제기");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","3. 국토 및 지역계획의 역사적 전개","2. 국토 및 지역계획의 변천과정");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","3. 국토 및 지역계획의 역사적 전개","3. 지역계획의 실상과 문제점");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","1. 국토 및 지역계획의 개념","3. 국토 및 지역계획의 역사적 전개","4. 지역계획체계의 구상");
+
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","2. 공간 단위 설정과 계획 과정","1. 공간단위 설정","1. 지역 및 공간의 개념과 의미");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","2. 공간 단위 설정과 계획 과정","1. 공간단위 설정","2. 지역획정의 원칙");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","2. 공간 단위 설정과 계획 과정","1. 공간단위 설정","3. 계획단위로서의 지역 및 공간");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","2. 공간 단위 설정과 계획 과정","1. 공간단위 설정","4. 한국의 국토 및 지역계획체계");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","2. 공간 단위 설정과 계획 과정","2. 계획과정","1. 계획의 의미");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","2. 공간 단위 설정과 계획 과정","2. 계획과정","2. 계획과정과 계획이론의 발달");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","2. 공간 단위 설정과 계획 과정","2. 계획과정","3. 절차이론과 주민참여");
+
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","1. 지역발전이론","1. 기본수요이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","1. 지역발전이론","2. 신고전이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","1. 지역발전이론","3. 성장거점이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","1. 지역발전이론","4. 종속적 발전이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","1. 지역발전이론","5. 생태학적 발전이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","1. 지역발전이론","6. 기타 지역발전이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","2. 공간구조이론","1. 중심지이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","2. 공간구조이론","2. 산업입지이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","2. 공간구조이론","3. 주거입지론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","2. 공간구조이론","4. 기타 공간구조 이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","3. 대안적 발전이론","1. 대안적 지역발전이론의 모색");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","3. 대안적 발전이론","2. 전통적 지역발전이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","3. 대안적 발전이론","3. 신지역발전이론");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","3. 국토 및 지역계획 이론","3. 대안적 발전이론","4. 향후 지역발전이론의 과제");
+
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","1. 자료조사 분석과 계획의 평가","1. 지역조사와 정보의 관리(자료의 출처, 자료수집 방법, 자료수집 내용, 공간정보의 활용, 지리정보 체계)");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","1. 자료조사 분석과 계획의 평가","2. 국토 및 지역계획의 평가(지역계획 평가의 의의, 지역계획 영향의 측정, 예측결과의 비교)");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","1. 계획인구의 예측");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","2. 토지이용계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","3. 지역교통계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","4. 산업진흥계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","5. 환경보전 및 자원관리계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","6. 주거환경계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","7. 사회개발계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","8. 농촌계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","9. 방재계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","2. 부문적 계획 ","10. 경관계획");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","3. 전망과 과제","1. 한국 국토 및 지역계획과 관련한 제반 여건과 변화");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","4. 국토 및 지역계획의 실제","3. 전망과 과제","2. 한국 국토 및 지역계획의 발전 과제");
+
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","1. 국토종합계획","1. 국토종합계획의 개념");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","1. 국토종합계획","2. 국토종합계획의 주요내용");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","1. 국토종합계획","3. 토지이용의 관리와 규제");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","1. 국토종합계획","4. 국토종합계획의 평가");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","2. 수도권정비계획","1. 수도권정비계획의 필요성");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","2. 수도권정비계획","2. 수도권정비계획의 개요");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","2. 수도권정비계획","3. 수도권정비계획의 주요내용");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","2. 수도권정비계획","4. 수도권정비계획의 전략");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","3. 지역계획","1. 지역계획의 개요");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","3. 지역계획","2. 지역계획의 추진내용");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","3. 지역계획","3. 지역계획의 평가");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","4. 광역도시계획","1. 광역도시계획의 개요");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","4. 광역도시계획","2. 광역도시계획의 추진내용");
+INSERT INTO classification(subject,large,medium,small) 
+VALUES ("국토 및 지역계획","5. 우리나라의 국토 및 지역계획","4. 광역도시계획","3. 광역도시계획의 평가");
+
+
+-- 5과목 도시계획 관련 법규
+
+
 
 
 INSERT INTO problemheader(year,serial,type,subject,classify,level,large,medium,small,pNum)
-		VALUES ("2006","1","A형","도시계획론","app","high","1. 도시의 개념 및 도시발달","1. 도시와 도시문제","1. 도시의 개념과 정의",2);
+		VALUES ("2006","1","A형","도시계획론","app","high","1. 도시의 개념 및 도시발달","1. 도시와 도시문제","1. 도시의 개념과 정의",3);
 INSERT INTO problemheader(year,serial,type,subject,classify,level,large,medium,small,pNum)
 		VALUES ("2006","1","A형","도시계획론","basic","normal","1. 도시의 개념 및 도시발달","1. 도시와 도시문제","1. 도시의 개념과 정의",0);
 

@@ -13,6 +13,7 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
@@ -162,13 +163,13 @@ class Query {
 			String subject, String large, String medium, String small) {
 
 		Vector<Integer> pNum = new Vector<Integer>();
-		String wherecond = "year=" + year + ", serial=" + serial + ", type="
-				+ type + ", subject=" + subject + ", large=" + large
-				+ ", medium=" + medium + ", small=" + small;
+		String wherecond = "year=\"" + year + "\" AND serial=\"" + serial + "\" AND type=\""
+				+ type + "\" AND subject=\"" + subject + "\" AND large=\"" + large
+				+ "\" AND medium=\"" + medium + "\" AND small=\"" + small +"\"";
 		// select MAX(pNum) from table where wherecond GROUPBY year, serial, type, subject, large, medium, small
 		//위와 같이 쿼리해서 pNum에 결과를 모두 저장해서 리턴
 		String q;
-		q = "SELECT MAX(pNum) FROM " + table + " WHERE " + wherecond +" GROUPBY year, serial, type, subject, large, medium, small";
+		q = "SELECT pNum FROM " + table + " WHERE " + wherecond;
 		try {
 			resultSet = statement.executeQuery(q);
 			while(resultSet.next()){
@@ -180,8 +181,8 @@ class Query {
 		return pNum;
 	}
 
-	public int getProblemID(String table, Vector<String> wherecond) {
-		int problemID = -1;
+	public Vector<Integer> getProblemID(String table, Vector<String> wherecond) {
+		Vector<Integer> problemID = new Vector<Integer>();
 		// 문제 수정에서 선택 버튼이 눌렸을 때 ProblemID 를 리턴해주는 함수
 		// select problemID from table where wherecond.get(0) 형태의 쿼리를 함.
 		String q;
@@ -191,21 +192,85 @@ class Query {
 				q += " AND ";
 			q += wherecond.elementAt(i);
 		}
-System.out.println(q);
 		try {
-System.out.println(problemID);	
 			resultSet = statement.executeQuery(q);
-			resultSet.next();
-			problemID = (int)resultSet.getObject(1);
-System.out.println(problemID);			
+			while(resultSet.next()){
+				problemID.add((int)resultSet.getObject(1));
+			}			
 		} catch (SQLException e) {
 			Message msg = new Message();
 			msg.alertMessage(null, "해당 문제가 없습니다.");
 			//e.printStackTrace();
 		}
 		finally{
-			return problemID;	
+			return problemID;
 		}
 	}
+	
+	public Vector<Vector<String>> getProblemHeader(Vector<Integer> problemID){
+		String q;
+		Vector<Vector<String>> problemInfo;
+		problemInfo = new Vector<Vector<String>>();
+		try {
+			for(int i=0;i<problemID.size();i++){
+				q = "SELECT * FROM problemheader WHERE problemID = \"" + problemID.elementAt(i).toString() + "\""; //problemID에 해당하는 문제정보를 가져오는 쿼리문
+				System.out.println(q);
+				resultSet = statement.executeQuery(q);
+				//문제 정보를 파싱해서 담음
+
+					ResultSetMetaData metaData = resultSet.getMetaData();
+					int numberOfColumns = metaData.getColumnCount();
+				if(i==0){
+					problemInfo.addElement(new Vector<String>());
+					for(int j=1;j<=numberOfColumns;j++){ //ATTRIBUTE 수만큼 돌면서		
+						problemInfo.get(problemInfo.size()-1).add((String)metaData.getColumnName(j)); //해당 ATTRIBUTE 이름
+					}
+				}
+				while(resultSet.next()){ //다음 문제 선택             m;각각 다른 문제, k;한 문제에 대한 구성 요소들을 돈다
+					problemInfo.addElement(new Vector<String>());
+					for(int k=1;k<=numberOfColumns;k++){ //돌면서 ATTRIBUTE출력
+						problemInfo.get(problemInfo.size()-1).add(resultSet.getObject(k).toString());
+					}
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return problemInfo; //problemInfo.get(0) 벡터에는 각 컬럼이름이 그 이후로는 한문제씩 벡터스트링으로 저장
+	}
+	public Vector<Vector<String>> getProblemBody(Vector<Integer> problemID){
+		String q;
+		Vector<Vector<String>> problemInfo;
+		problemInfo = new Vector<Vector<String>>();
+		try {
+			for(int i=0;i<problemID.size();i++){
+				q = "SELECT * FROM problembody WHERE problemID = \"" + problemID.elementAt(i).toString() + "\""; //problemID에 해당하는 문제정보를 가져오는 쿼리문
+				System.out.println(q);
+				resultSet = statement.executeQuery(q);
+				//문제 정보를 파싱해서 담음
+
+					ResultSetMetaData metaData = resultSet.getMetaData();
+					int numberOfColumns = metaData.getColumnCount();
+				if(i==0){
+					problemInfo.addElement(new Vector<String>());
+					for(int j=1;j<=numberOfColumns;j++){ //ATTRIBUTE 수만큼 돌면서		
+						problemInfo.get(problemInfo.size()-1).add((String)metaData.getColumnName(j)); //해당 ATTRIBUTE 이름
+					}
+				}
+				while(resultSet.next()){ //다음 문제 선택             m;각각 다른 문제, k;한 문제에 대한 구성 요소들을 돈다
+					problemInfo.addElement(new Vector<String>());
+					for(int k=1;k<=numberOfColumns;k++){ //돌면서 ATTRIBUTE출력
+						problemInfo.get(problemInfo.size()-1).add(resultSet.getObject(k).toString());
+					}
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return problemInfo; //problemInfo.get(0) 벡터에는 각 컬럼이름이 그 이후로는 한문제씩 벡터스트링으로 저장
+	}
+	
 }// Query
 

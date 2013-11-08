@@ -15,11 +15,13 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 class SelectOptionsAdjForm extends JFrame  {
 
 	// 선택 버튼이 눌리면 채워질 변수들
-	private int year, pNum, problemID;
+	private int year, pNum;
+	private Vector<Integer> problemID;
 	private String serial, type, subject;
 	private String classify, level;
 	private String large, medium, small;
@@ -55,6 +57,7 @@ class SelectOptionsAdjForm extends JFrame  {
 
 	// ============AdjustProblemForm GUI 변수들==================//
 	private JPanel adjustPane;
+	private JTextField pNum_TB;
 	private JButton adjustButton, deleteButton;
 
 	// 번호도 텍스트 상자로 보여주고 수정 가능하도록 함.
@@ -131,6 +134,7 @@ class SelectOptionsAdjForm extends JFrame  {
 		small_CB = new JComboBox<String>();
 		small_CB.setPreferredSize(new Dimension(100, 21));
 		small_CB.setName("small");
+		small_CB.addActionListener(new ComboBoxListener());
 		persub_P.add(small_CB);
 
 		etc_P = new JPanel();
@@ -177,7 +181,11 @@ class SelectOptionsAdjForm extends JFrame  {
 		etc_P.add(easy_RB);
 
 		selectPane.add(etc_P);
-
+		
+		pNum_CB = new JComboBox<Integer>();
+		pNum_CB.setName("pNum");
+		selectPane.add(pNum_CB);
+		
 		selectButton = new JButton();
 		selectButton.setText("선택");
 		selectButton.setName("selectButton");
@@ -293,12 +301,11 @@ System.out.println("메이크셀렉트웨얼" + level);
 //이걸 왜함?			clearOptions();
 				 	
 				//3.수정 Form 을 생성
-				 if(problemID!=-1)
+				 if(problemID!=null)
 					 adjustForm = new AdjustProblemForm();
 				}
 			}
 			if (button.getName() == "adjustButton") {
-System.out.println("수정할거당" + problemID);
 				// 1.checkEmpty(); 로 입력 안 된 항목이 있나 체크
 				// 2.만약 에러라면
 				// message.alertMessage(button.getRootPane().getParent(), "입력되지 않은 항목이 있습니다.");
@@ -311,8 +318,8 @@ System.out.println("수정할거당" + problemID);
 				Query query = new Query();
 choice1 = "수정됏나";
 				makeUpdateSet();
-				query.doUpdates(phTable, adjust_phTable, "problemID="+problemID);
-				query.doUpdates(pbTable, adjust_pbTable, "problemID="+problemID);
+				query.doUpdates(phTable, adjust_phTable, "problemID="+problemID.get(0));
+				query.doUpdates(pbTable, adjust_pbTable, "problemID="+problemID.get(0));
 				// clearContents() 로 화면 초기화
 				query.close();
 				query.finalize();
@@ -324,9 +331,9 @@ choice1 = "수정됏나";
 				// 2. Query.doDeletes(phTable, problemID);
 				// 3. 오류가 없다면 clearContents();
 				Query query = new Query();
-System.out.println("삭제할거당" + problemID);
-				query.doDeletes(phTable, "problemID="+problemID);
-				query.doDeletes(pbTable, "problemID="+problemID);
+System.out.println("삭제할거당" + problemID.get(0));
+				query.doDeletes(phTable, "problemID="+problemID.get(0));
+				query.doDeletes(pbTable, "problemID="+problemID.get(0));
 				query.close();
 				query.finalize();
 			}
@@ -440,7 +447,6 @@ System.out.println("삭제할거당" + problemID);
 			M = combobox.getSelectedItem().toString();
 			selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L, medium_CB.getName(), M);
 			small_items = getLMS.getSmall(classTable, sub, L, M, selectWhere);
-
 			// small_items 벡터에 있는 개수 만큼 addItem 수행
 			Vector<String> small_items_clone = (Vector<String>) small_items.clone();
 			for (String item : small_items_clone) {
@@ -459,7 +465,7 @@ System.out.println("삭제할거당" + problemID);
 				set_medium(combobox);
 			} else if (combobox.getName() == "medium"  && !(combobox.getSelectedItem()==null)) {
 				set_small(combobox);
-			}else if (combobox.getName() == "small") {
+			}else if (combobox.getName() == "small" && !(combobox.getSelectedItem()==null)){	
 				// pNum 채우기
 				setPnumCombo();
 			}
@@ -469,10 +475,39 @@ System.out.println("삭제할거당" + problemID);
 		private void setPnumCombo() {
 			Vector<Integer> maxPnum = new Vector<Integer>();
 			Query query = new Query();
-
+pNum_CB.removeAllItems();
 			//쿼리로 해당 분류에 존재하는 문제 번호를 모두 가져옴
-			maxPnum = query.getPnum(phTable, year, serial, type, subject, large,
-					medium, small);
+
+/*이거여기서이래도됨????????????
+year = (int)year_CB.getSelectedItem();
+serial = serial_CB.getSelectedItem().toString();
+type = type_CB.getSelectedItem().toString();
+subject = subject_CB.getSelectedItem().toString();
+if(basic_RB.isSelected() == true){
+	classify = basic_RB.getName();
+}else if(app_RB.isSelected() == true){
+	classify = app_RB.getName();
+}else if(calc_RB.isSelected() == true){
+	classify = calc_RB.getName();
+} 
+if(high_RB.isSelected() == true){
+	level = high_RB.getName();
+}else if(normal_RB.isSelected() == true){
+	level = normal_RB.getName();
+}else if(easy_RB.isSelected() == true){
+	level = easy_RB.getName();
+}
+large = large_CB.getSelectedItem().toString();
+medium =  medium_CB.getSelectedItem().toString();
+small = small_CB.getSelectedItem().toString();
+*/
+maxPnum = query.getPnum(phTable, (int)year_CB.getSelectedItem(),
+						serial_CB.getSelectedItem().toString(), type_CB.getSelectedItem().toString(),
+						subject_CB.getSelectedItem().toString(), large_CB.getSelectedItem().toString(),
+						medium_CB.getSelectedItem().toString(), small_CB.getSelectedItem().toString());
+System.out.println(maxPnum);
+//			maxPnum = query.getPnum(phTable, year, serial, type, subject, large,
+//					medium, small);
 			query.close();
 			query.finalize();
 			//존재하는 문제 번호만으로 ComboBox를 구성해서 번호 선택에 오류가 없도록 함.
