@@ -22,24 +22,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 
-public class MainForm extends JFrame{
+class MainForm extends JFrame{
 
-	JPanel mainContent_P, home_P, dbManage_P, probManage_P;
-	JPanel basic_P, basicLabel_P, basicText_P;
-	JPanel persub_P, large_P, medium_P, small_P;
-	JPanel blank_P, probIns_P, probAdj_P, outFile_P;
-	JTabbedPane mainTabbed_P;
-	JScrollPane	dbManage_Scr;
-	JLabel year_L, serial_L, type_L, subject_L;
-	JLabel large_L, medium_L, small_L;
-	JTextField year_TB, serial_TB, type_TB, subject_TB;
-	JTextField large_TB, medium_TB, small_TB;
-	JButton add_Btn, dbClear_Btn;
-	JButton probIns_Btn, probAdj_Btn, outFile_Btn;
-	Box button_Box;
-
-	Dimension resolution;
-	Component button_glue, button_glue_1, button_glue_2;
+	private JPanel mainContent_P, home_P, dbManage_P, probManage_P;
+	private JPanel subject_P, basic_P, basicLabel_P, basicText_P;
+	private JPanel persub_P, large_P, medium_P, small_P;
+	private JPanel blank_P, probIns_P, probAdj_P, outFile_P;
+	private JTabbedPane mainTabbed_P;
+	private JScrollPane	dbManage_Scr;
+	private JLabel year_L, serial_L, subject_L;
+	private JLabel large_L, medium_L, small_L;
+	private JTextField year_TB, serial_TB, subject_TB;
+	private JTextField large_TB, medium_TB, small_TB;
+	private JButton add_Btn, dbClear_Btn;
+	private JButton probIns_Btn, probAdj_Btn, outFile_Btn;
+	private Box button_Box;
+	private Dimension resolution;
+	private Component subject_glue, button_glue, button_glue_1, button_glue_2;
 
 	MainForm()
 	{
@@ -57,6 +56,7 @@ public class MainForm extends JFrame{
 		outFile_P=new JPanel();
 		dbManage_Scr=new JScrollPane(dbManage_P);
 
+		subject_P = new JPanel();
 		basic_P=new JPanel();
 		basicLabel_P=new JPanel();
 		basicText_P= new JPanel();
@@ -68,16 +68,14 @@ public class MainForm extends JFrame{
 		//레이블 초기화
 		year_L=new JLabel("기출년도");
 		serial_L=new JLabel("회차");
-		type_L=new JLabel("유형");
 		subject_L=new JLabel("과목");
 		large_L=new JLabel("대 분류");
 		medium_L=new JLabel("중 분류");
-		small_L=new JLabel("중 분류");
+		small_L=new JLabel("소 분류");
 
 		//텍스트 필드 초기화
 		year_TB=new JTextField();
 		serial_TB=new JTextField();
-		type_TB=new JTextField();
 		subject_TB=new JTextField();
 		large_TB=new JTextField();
 		medium_TB=new JTextField();
@@ -85,26 +83,27 @@ public class MainForm extends JFrame{
 
 		//버튼, Box 초기화
 		add_Btn= new JButton("추가");
-		dbClear_Btn= new JButton("데이터베이스 초기화");
+		dbClear_Btn= new JButton("초기화");
 		probIns_Btn=new JButton("문제 입력");
 		probAdj_Btn=new JButton("문제 수정");
 		outFile_Btn=new JButton("파일 출력");
 		button_Box= Box.createHorizontalBox();
 
 		resolution=Toolkit.getDefaultToolkit().getScreenSize();
+
+		subject_glue=Box.createGlue();
 		button_glue=Box.createGlue();
 		button_glue_1=Box.createGlue();
 		button_glue_2=Box.createGlue();
 
 		//=============멤버 변수 초기화 끝==============//
 
-		setBounds(0, 0, 600, 400);
+		setBounds(0, 0, 400, 400);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setContentPane(mainContent_P);
 
 		mainContent_P.setLayout(new BoxLayout(mainContent_P, BoxLayout.Y_AXIS));
 		mainTabbed_P.setPreferredSize(new Dimension(400, 400));
-
 		mainContent_P.add(mainTabbed_P);
 
 		//tab생성
@@ -116,15 +115,15 @@ public class MainForm extends JFrame{
 		dbManage_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		dbManage_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		dbManage_Scr.setPreferredSize(new Dimension(600, 400));
-
 		probManage_P.setPreferredSize(new Dimension(600, 400));
 		probManage_P.setLayout(new BoxLayout(probManage_P, BoxLayout.Y_AXIS));
 
 		//==================dbManage_P설정=======================//
 
 		//basic_P
+		basic_P.setBorder(new TitledBorder(null, "년도, 회차", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
 		basic_P.setLayout(new BoxLayout(basic_P, BoxLayout.PAGE_AXIS));
-		basic_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 100));
+		basic_P.setMaximumSize(new Dimension(300, 130));
 		basic_P.setLayout(new BoxLayout(basic_P, BoxLayout.Y_AXIS));
 		basicLabel_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 30));
 
@@ -138,19 +137,24 @@ public class MainForm extends JFrame{
 		serial_TB.setPreferredSize(new Dimension(80, 30));
 		serial_TB.setName("serial");
 
-		type_L.setPreferredSize(new Dimension(80, 30));
-		type_L.setBorder(new EmptyBorder(10, 10, 0, 0));
-		type_TB.setPreferredSize(new Dimension(80, 30));
-		type_TB.setName("type");
-
-		subject_L.setPreferredSize(new Dimension(100, 30));
-		subject_L.setBorder(new EmptyBorder(10, 10, 0, 0));
-		subject_TB.setPreferredSize(new Dimension(100, 30));
-		subject_TB.setName("subject");
 
 		//persub_P
+		persub_P.setBorder(new TitledBorder(null, "과목, 대/중/소 분류", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
 		persub_P.setLayout(new BoxLayout(persub_P, BoxLayout.PAGE_AXIS));
-		persub_P.setMaximumSize(new Dimension(600,150));
+		persub_P.setMaximumSize(new Dimension(600,250));
+
+		subject_P.setLayout(new BoxLayout(subject_P, BoxLayout.LINE_AXIS));
+		subject_P.setMaximumSize(new Dimension(200, 40));
+		subject_glue.setMaximumSize(new Dimension(5, 30));
+		subject_glue.setPreferredSize(new Dimension(5, 30));
+
+		subject_L.setMaximumSize(new Dimension(50, 30));
+		subject_L.setPreferredSize(new Dimension(50, 30));
+		subject_L.setBorder(new EmptyBorder(10, 10, 0, 0));
+		subject_TB.setMaximumSize(new Dimension(200, 40));
+		subject_TB.setPreferredSize(new Dimension(200, 40));
+		subject_TB.setName("subject");
+
 		large_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 		large_TB.setPreferredSize(new Dimension(500, 35));
 		large_TB.setName("large");
@@ -167,24 +171,23 @@ public class MainForm extends JFrame{
 		//추가 버튼 전 글루
 		button_Box.setMaximumSize(new Dimension(600,100));
 		button_Box.setPreferredSize(new Dimension(600, 100));
-
-		button_glue.setMaximumSize(new Dimension(70, 32767));
+		button_glue.setMaximumSize(new Dimension(5, 32767));
 
 		add_Btn.setName("add_Btn");
 		add_Btn.addActionListener(new ButtonClickListener());
 		add_Btn.setMaximumSize(new Dimension(70, 45));
 		add_Btn.setPreferredSize(new Dimension(70, 45));
 
-		//추가 버튼과 출력버튼 사이 글루
-		button_glue_1.setMaximumSize(new Dimension(180, 32767));
+		//추가 버튼과 초기화버튼 사이 글루
+		button_glue_1.setMaximumSize(new Dimension(520, 32767));
 
 		dbClear_Btn.setName("dbClear_Btn");
 		dbClear_Btn.addActionListener(new ButtonClickListener());
-		dbClear_Btn.setMaximumSize(new Dimension(250, 45));
-		dbClear_Btn.setPreferredSize(new Dimension(250, 45));
+		dbClear_Btn.setMaximumSize(new Dimension(70, 45));
+		dbClear_Btn.setPreferredSize(new Dimension(70, 45));
 		dbClear_Btn.setBackground(Color.RED);
-		//추가 버튼 후 글루
-		button_glue_2.setMaximumSize(new Dimension(10, 32767));
+
+		button_glue_2.setMaximumSize(new Dimension(5, 32767));
 
 		//컴포넌트들 add관계
 
@@ -193,19 +196,23 @@ public class MainForm extends JFrame{
 		mainTabbed_P.addTab("문제 관리", null, probManage_P, null);
 
 		//basic_P
+
 		basic_P.add(basicLabel_P);
 		basic_P.add(basicText_P);
 
 		basicLabel_P.add(year_L);
 		basicLabel_P.add(serial_L);
-		basicLabel_P.add(type_L);
 		basicLabel_P.add(subject_L);
 		basicText_P.add(year_TB);
 		basicText_P.add(serial_TB);
-		basicText_P.add(type_TB);
 		basicText_P.add(subject_TB);
 
 		//persub_P
+
+		subject_P.add(subject_L);
+		subject_P.add(subject_glue);
+		subject_P.add(subject_TB);
+		persub_P.add(subject_P);
 		persub_P.add(large_P);
 		persub_P.add(medium_P);
 		persub_P.add(small_P);
@@ -235,22 +242,22 @@ public class MainForm extends JFrame{
 		//==================probManage_P 설정=====================//
 		probIns_Btn.setName("probIns_Btn");
 		probIns_Btn.addActionListener(new ButtonClickListener());
-		probIns_Btn.setMaximumSize(new Dimension(500, 40));
-		probIns_Btn.setPreferredSize(new Dimension(500, 40));
+		probIns_Btn.setMaximumSize(new Dimension(320, 40));
+		probIns_Btn.setPreferredSize(new Dimension(320, 40));
 		probIns_Btn.setBackground(new Color(0, 0, 0));
 		probIns_Btn.setForeground(new Color(217, 0, 35));
 
 		probAdj_Btn.setName("probAdj_Btn");
 		probAdj_Btn.addActionListener(new ButtonClickListener());
-		probAdj_Btn.setMaximumSize(new Dimension(500, 40));
-		probAdj_Btn.setPreferredSize(new Dimension(500, 40));
+		probAdj_Btn.setMaximumSize(new Dimension(320, 40));
+		probAdj_Btn.setPreferredSize(new Dimension(320, 40));
 		probAdj_Btn.setBackground(new Color(0, 0, 0));
 		probAdj_Btn.setForeground(new Color(217, 180, 0));
 
 		outFile_Btn.setName("outFile_Btn");
 		outFile_Btn.addActionListener(new ButtonClickListener());
-		outFile_Btn.setMaximumSize(new Dimension(500, 40));
-		outFile_Btn.setPreferredSize(new Dimension(500, 40));
+		outFile_Btn.setMaximumSize(new Dimension(320, 40));
+		outFile_Btn.setPreferredSize(new Dimension(320, 40));
 		outFile_Btn.setBackground(new Color(0, 0, 0));
 		outFile_Btn.setForeground(new Color(0, 75, 246));
 
@@ -304,6 +311,26 @@ public class MainForm extends JFrame{
 			{
 				OutFileForm printFile = new OutFileForm();
 			}
+			else if(evt_Btn.getName()=="dbClear_Btn")
+			{
+				Query query = new Query();
+				query.dbInit();
+				query.close();
+			}
+			else if(evt_Btn.getName()=="add_Btn")
+			{
+				Query query = new Query();
+				query.doInserts("basicoption1","null,\""+year_TB.getText().toString()+"\""
+						+",\""+serial_TB.getText().toString()+"\"");
+				query.doInserts("basicoption2","null,\""+subject_TB.getText().toString()+"\"");
+				query.doInserts("classification","null,\""+subject_TB.getText().toString()+"\""
+						+",\""+large_TB.getText().toString()+"\""
+						+",\""+medium_TB.getText().toString()+"\""
+						+",\""+small_TB.getText().toString()+"\"");
+				query.close();
+			}
+
+
 
 		}
 

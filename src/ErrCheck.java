@@ -22,14 +22,24 @@ interface ErrCheck {
 }
 
 interface ClearGUI {
-	void clearOptions();
+//	void clearOptions();
 
-	void clearContents();
+//	void clearContents();
 }
 
 class Message {
 	public void alertMessage(Component target, String msg) {
-		JOptionPane.showConfirmDialog(target, msg);
+		JOptionPane.showConfirmDialog(target, msg,"알림",JOptionPane.CLOSED_OPTION);
+	}
+	public int yesnoMessage(Component target, String msg) {
+		int dialog = JOptionPane.showConfirmDialog(target, msg,"선택",JOptionPane.YES_NO_OPTION);
+		return dialog;
+		/*
+		  if(dialog==JOptionPane.YES_OPTION)
+		  
+		  else if(dialog==JOptionPane.NO_OPTION)
+		  
+		 */
 	}
 
 }

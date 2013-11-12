@@ -1,48 +1,39 @@
-
+import java.sql.*;
 import java.awt.Component;
 import java.awt.Dimension;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Vector;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
-import rtf.AdvancedRTFEditorKit;
-import rtf.writer.RTFWriter;
-import sl.docx.DocxEditorKit;
-import sl.docx.DocxDocument;
-import sl.docx.writer.DocxWriter;
 
-import javax.swing.text.html.HTMLEditorKit;
+
 import javax.swing.text.rtf.RTFEditorKit;
 import javax.swing.text.StyledDocument;
 
+
+ 
 class SelectOptionsInsForm extends JFrame {
 
 	// 선택 버튼이 눌리면 채워질 변수들
@@ -52,12 +43,16 @@ class SelectOptionsInsForm extends JFrame {
 	private String large, medium, small;
 
 	// 입력 버튼이 눌리면 채워질 변수들
-	private int pNum;
-	private Vector<String> insert_phTable;
-	private Vector<String> insert_pbTable;
-	private String selectWhere;
+	private int pNum, answer;
+	private String problem, addition;
+	private String choice1, choice2, choice3, choice4;
+	private String keyword, solution;
 
-	//테이블 이름
+	private String insert_phTable;
+	private String insert_pbTable;
+	private String selectWhere;
+	
+	//테이블이름
 	private String phTable, pbTable, classTable;
 	private String bTable1, bTable2;
 
@@ -84,23 +79,21 @@ class SelectOptionsInsForm extends JFrame {
 	private JLabel year_L, serial_L, type_L, subject_L;
 	private JLabel large_L, medium_L, small_L;
 
-	
+
 	// RTF로 구성 된 텍스트 상자와 답, 풀이 들을 표시할 RadioButton 과 CheckBox가 들어 갈 자리
 
 	SelectOptionsInsForm() {
 		// 멤버 변수들 초기화
-
 		selectWhere = null;
-		insert_phTable = new Vector<String>();
-		insert_pbTable = new Vector<String>();
-
-		//테이블 이름
+		insert_phTable = null;
+		insert_pbTable = null;
+		//테이블이름
 		phTable = "problemheader";
 		pbTable = "problembody";
 		classTable = "classification";
 		bTable1 = "basicoption1";
 		bTable2 = "basicoption2";
-
+		
 		message = new Message();
 		getLMS = new GetLMS();
 		sub = null;
@@ -132,12 +125,14 @@ class SelectOptionsInsForm extends JFrame {
 		large_L=new JLabel("대 분류");
 		medium_L=new JLabel("중 분류");
 		small_L=new JLabel("소 분류");
-	
+
 		// 멤버 변수들 초기화 끝
 
+		// 화면 구성
 		this.setTitle("입력할 분류 선택");
 
 		// content_P 설정
+	
 		setBounds(0, 0, 600, 350);
 		select_P.setLayout(new BoxLayout(select_P, BoxLayout.PAGE_AXIS));
 		setContentPane(select_P);
@@ -148,22 +143,26 @@ class SelectOptionsInsForm extends JFrame {
 		year_CB = new JComboBox<Integer>();
 		year_CB.setPreferredSize(new Dimension(100, 30));
 		year_CB.setName("year");
+		
 		basicCombo_P.add(year_CB);
 
 		serial_CB = new JComboBox<String>();
 		serial_CB.setPreferredSize(new Dimension(80, 30));
 		serial_CB.setName("serial");
+		
 		basicCombo_P.add(serial_CB);
 
 		type_CB = new JComboBox<String>();
 		type_CB.setPreferredSize(new Dimension(80, 30));
 		type_CB.setName("type");
+		
 		basicCombo_P.add(type_CB);
 
 		subject_CB = new JComboBox<String>();
 		subject_CB.setPreferredSize(new Dimension(100, 30));
 		subject_CB.setName("subject");
 		subject_CB.addActionListener(new ComboBoxListener());
+		
 		basicCombo_P.add(subject_CB);
 
 		//label
@@ -202,6 +201,7 @@ class SelectOptionsInsForm extends JFrame {
 		large_CB = new JComboBox<String>();
 		large_CB.setPreferredSize(new Dimension(400, 35));
 		large_CB.setName("large");
+		
 		large_CB.addActionListener(new ComboBoxListener());
 
 		large_P.setMaximumSize(new Dimension(500, 70));
@@ -211,6 +211,7 @@ class SelectOptionsInsForm extends JFrame {
 		medium_CB = new JComboBox<String>();
 		medium_CB.setPreferredSize(new Dimension(400, 35));
 		medium_CB.setName("medium");
+		
 		medium_CB.addActionListener(new ComboBoxListener());
 
 		medium_P.setMaximumSize(new Dimension(500, 70));
@@ -220,6 +221,7 @@ class SelectOptionsInsForm extends JFrame {
 		small_CB = new JComboBox<String>();
 		small_CB.setPreferredSize(new Dimension(400, 35));
 		small_CB.setName("small");
+
 
 		small_P.add(small_L);
 		small_P.add(small_CB);
@@ -309,29 +311,57 @@ class SelectOptionsInsForm extends JFrame {
 
 	// 생성자에서 호출되며, 기출 년도, 회차, 유형, 과목을 각 ComboBox에 채워 넣는 함수
 	private void fillInit() {
-
+		Query query =  new Query();
 		Vector<String> selectBasic1 = new Vector<String>();
 		Vector<String> selectBasic2 = new Vector<String>();
-
-		selectBasic1.add(year_CB.getName() + ", " + serial_CB.getName());
-		selectBasic2.add(type_CB.getName() + ", " + subject_CB.getName()+ ", classify" + ", level");
+		ResultSet resultSet;
 
 		//데이터 베이스에 질의
-		selectBasic1 = Query.doSelects(selectBasic1, bTable1, null);
-		selectBasic2 = Query.doSelects(selectBasic2, bTable1, null);
-
+		selectBasic1.add(year_CB.getName());
+		resultSet = query.doSelects(selectBasic1, bTable1, null);		
+		selectBasic1.clear();
+		parseQuery(resultSet);
+		selectBasic1.add(serial_CB.getName());
+		resultSet = query.doSelects(selectBasic1, bTable1, null);
+		parseQuery(resultSet);
+		selectBasic2.add(type_CB.getName());
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
+		selectBasic2.clear();
+		parseQuery(resultSet);
+		selectBasic2.add(subject_CB.getName());
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
+		parseQuery(resultSet);
 		//받아온 결과를 파싱 및 ComboBox 에 반영
-		parseQuery();
-
+		parseQuery(resultSet);
+		query.close();
 	}
 
-	private void parseQuery() {
+	private void parseQuery(ResultSet resultSet) {
 		// fillInit에서 읽어온 쿼리를 addItem 하기 전에 각 항목에 맞는 형태로 파싱하기 위한 작업
 		// 파싱을 하면서 곧 바로 addItem 을 하는 것이 편할 것으로 판단 됨.
-		//1.파싱
+		//1. 파싱
 		//2. ComboBox에 저장
 		// year_CB.addItem(" ");
 		// serial_CB.addItem(); 형식
+		try {
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			
+			if(metaData.getColumnName(1).equals("year")){
+				while(resultSet.next())
+					year_CB.addItem((Integer) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("serial")){
+				while(resultSet.next())
+					serial_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("type")){
+				while(resultSet.next())
+					type_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("subject")){
+				while(resultSet.next())
+					subject_CB.addItem((String) resultSet.getObject(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// 버튼 클릭 이벤트리스너 시작
@@ -340,136 +370,229 @@ class SelectOptionsInsForm extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JButton button = (JButton) e.getSource();
-			if (button.getName() == "select_Btn") {
+			if (button.getName() == "select_Btn") {		
 
-				/*
-				 * 1 checkDanglingElement(); 로 선택 안 된 항목이 있나 체크
-				 * if(에러면) {
-				 * 		message.alertMessage(button.getRootPane().getParent(), "모든 항목을 선택 해야 합니다.");
-				 * } else {
-				 *  //현재 까지 선택된 내용을 각각의 변수에 채워넣는다..(SelectOptionsInsForm 변수 선언 부분에 선언된 변수들)
-				 *
-				 *
-				 * year=(int)year_CB.getSelectedItem();
-				 * serial=serial_CB.getSelectedItem().toString();
-				 *
-				 *
-				 * //2. clearOptions로 화면 초기화
-				 *
-				 * //3.수정 Form 을 생성 insertForm = new InsertProblemForm(); }
-				 */
-
+				//1. checkDanglingElement(); 로 선택 안 된 항목이 있나 체크
+				if(checkDanglingElement()==false){ //에러
+					message.alertMessage(button.getRootPane().getParent(), "모든 항목을 선택 해야 합니다.");
+				}else {
+				//2.현재 까지 선택된 내용을 각각의 변수에 채워넣는다..(SelectOptionsAdjForm 변수 선언부분에 선언된 변수들)
+					year = (int)year_CB.getSelectedItem();
+					serial = serial_CB.getSelectedItem().toString();
+					type = type_CB.getSelectedItem().toString();
+					subject = subject_CB.getSelectedItem().toString();
+					if(basic_RB.isSelected() == true){
+						classify = basic_RB.getName();
+					}else if(app_RB.isSelected() == true){
+						classify = app_RB.getName();
+					}else if(calc_RB.isSelected() == true){
+						classify = calc_RB.getName();
+					} 
+					if(high_RB.isSelected() == true){
+						level = high_RB.getName();
+					}else if(normal_RB.isSelected() == true){
+						level = normal_RB.getName();
+					}else if(easy_RB.isSelected() == true){
+						level = easy_RB.getName();
+					}
+					if(large_CB.getSelectedItem()!=null)
+						large = large_CB.getSelectedItem().toString();
+					if(medium_CB.getSelectedItem()!=null)
+						medium = medium_CB.getSelectedItem().toString();
+					if(small_CB.getSelectedItem()!=null)
+						small = small_CB.getSelectedItem().toString();
+					
+					//2. clearOptions로 화면 초기화
+//이걸 왜함?			clearOptions();
+				}
+				//3.문제삽입 Form 을 생성
 				insertForm = new InsertProblemForm();
 			}
 
 			if (button.getName() == "insert_Btn") {
 				// 1.checkEmpty(); 로 입력 안 된 항목이 있나 체크
-				// 풀이 는 입력이 안 됐다면 풀이를 입력하지 않을 것인지 물어보는 메시지 상자를 띄우고, 예라면 그냥 넘어가고
-				// 아니오 라면 진행하지 않고 다시 입력을 기다린다.
-
-
+				if(checkEmpty()==false){
+					message.alertMessage(button.getRootPane().getParent(), "입력되지 않은 항목이 있습니다..");			
+				}else{
 				// 3.에러가 아니라면 번호, 문제 내용 등을 각 변수에 채워 넣는다.(SelectOptionsInsForm 변수
 				// 선언 부분에 선언된 변수들)
-				// makeInsertValues() 함수로 INSERT INTO의 VALUES 부분에 쓰일 문장을 구성한다.
-				// Query.doInserts(phTable, insert_phTable);
-				// Query.doInserts(pbTable, insert_pbTable);
+					pNum = Integer.parseInt(pNum_TB.getText());
+					problem = problem_TA.getText();
+					addition = addition_TA.getText();	
+					choice1 = exam1_TA.getText();
+					choice2 = exam2_TA.getText();			
+					choice3 = exam3_TA.getText();					
+					choice4 = exam4_TA.getText();					
+					keyword = explainK_TA.getText();					
+					solution = explainF_TA.getText();
+					if(solexam1_RB.isSelected() == true){
+						answer = 1;
+					}else if(solexam2_RB.isSelected() == true){
+						answer = 2;
+					}else if(solexam3_RB.isSelected() == true){
+						answer = 3;
+					}else if(solexam4_RB.isSelected() == true){
+						answer = 4;
+					}
 
-				// clearContents() 로 화면 초기화
-				//System.out.println(insertForm.problem_TA.getText());
-
-				StyledDocument doc =(StyledDocument) problem_TA.getDocument();
-				RTFWriter rtf_wr= new RTFWriter(doc);
-				try {
-					System.out.println(doc.getText(0, doc.getLength()));
-				} catch (BadLocationException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
+					// makeInsertValues() 함수로 INSERT INTO의 VALUES 부분에 쓰일 문장을 구성한다.
+					// Query.doInserts(phTable, insert_phTable);
+					// Query.doInserts(pbTable, insert_pbTable);
+					makeInsertValues();
+					
+					Query query = new Query();
+					int check = query.doInserts(phTable, insert_phTable);
+					if(check == 0) //haeder insert성공시에만
+						query.doInserts(pbTable, insert_pbTable);
+					query.close();
+					// clearContents() 로 화면 초기화
+//					clearContents();
 				}
-				/*
-				try {
-					rtf_wr.write("rtftest.rtf");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 
-				*/
-
-				// Load an RTF file into the editor
 			}
 		}//actionPerformed()
 		@Override
 		public boolean checkDanglingElement() {
 			// 모든 Option들이 선택 됐는지 ComboBox와 RadioButton 들을 점검
-			return true;
+	//라디오버튼을 선택 안할수가 없지...
+			if((year_CB.getSelectedItem() == null)
+				||(serial_CB.getSelectedItem() == null)
+				||(type_CB.getSelectedItem() == null)
+				||(subject_CB.getSelectedItem() == null)
+//				||(large_CB.getSelectedItem() == null)
+//				||(medium_CB.getSelectedItem() == null)
+//				||(small_CB.getSelectedItem() == null)
+			){
+				return false;
+			}else{
+				return true;
+			}
 		}
 
 		@Override
-		public boolean checkEmpty() {
+		public boolean checkEmpty() { //false면 비어있는 항목이 있는거
 			// 문제 입력 창에서 모든 항목들이 입력 됐는지 확인
+			if((pNum_TB.getText().isEmpty())
+				|| (problem_TA.getText().isEmpty())
+				|| (addition_TA.getText().isEmpty())
+				|| (exam1_TA.getText().isEmpty())
+				|| (exam2_TA.getText().isEmpty())
+				|| (exam3_TA.getText().isEmpty())
+				|| (exam4_TA.getText().isEmpty())
+				||((solexam1_RB.isSelected()==false)&&(solexam2_RB.isSelected()==false)
+						&&(solexam3_RB.isSelected()==false)&&(solexam4_RB.isSelected()==false))
+				){
+				return false;
+			}else if((explainK_TA.getText().isEmpty())
+					|| (explainF_TA.getText().isEmpty())){// 풀이 는 입력이 안 됐다면 풀이를 입력하지 않을 것인지 물어보는 메시지 상자를 띄우고, 예라면 그냥 넘어가고
+				// 아니오 라면 진행하지 않고 다시 입력을 기다린다.
+				int check=0;
+				check = message.yesnoMessage(null, "풀이가 입력되지 않았습니다. 그냥 진행하시겠습니까?");
+				if(check==JOptionPane.YES_OPTION) //YES면 계속진행
+					return true;
+				else if(check==JOptionPane.NO_OPTION) //NO면 진행취소
+					return false;
+			}
 			return true;
 		}
-		@Override
-		public void clearOptions() {
-			// 선택 버튼이 눌리고 오류가 없다면 year_CB, serial_CB.... 등 화면을 초기화
-		}
-		@Override
-		public void clearContents() {
-			// 입력 버튼이 눌리고 오류가 없다면
-		}
+
+//		@Override
+//		public void clearContents() {
+			// 입력 버튼이 눌리고 오류가 없다면 변수들 다시 널로 초기화
+			/*
+			 		pNum = Integer.parseInt(pNum_TB.getText());
+					problem = problem_TA.getText();
+					addition = addition_TA.getText();	
+					choice1 = exam1_TA.getText();
+					choice2 = exam2_TA.getText();			
+					choice3 = exam3_TA.getText();					
+					choice4 = exam4_TA.getText();					
+					keyword = explainK_TA.getText();					
+					solution = explainF_TA.getText();
+					if(solexam1_RB.isSelected() == true){
+						answer = 1;
+					}else if(solexam2_RB.isSelected() == true){
+						answer = 2;
+					}else if(solexam3_RB.isSelected() == true){
+						answer = 3;
+					}else if(solexam4_RB.isSelected() == true){
+						answer = 4;
+					}
+			 */
+			
+//		}
 
 		private void makeInsertValues() {
 			// 입력 버튼이 눌렸을 때 모든 Option 들과 문제 내용에 맞는 쿼리를 만들어주는 함수
-			// insert_phTable : year+", "+serial+", "+......+small;
 			// INSERT INTO VALUES( insert_phTable ) 처럼 쿼리에 사용 될 것임.
-
-			// insert_pbTable :
+			insert_phTable = "null," + year + ",\"" + serial + "\",\"" + type + "\",\"" + subject
+					 		+ "\",\"" + classify + "\",\"" + level + "\",\"" + large
+					 		 + "\",\"" + medium + "\",\"" + small + "\"," + pNum;
+			insert_pbTable = "\"" + problem + "\",\"" + addition + "\",\"" + choice1
+							+ "\",\"" + choice2 + "\",\"" + choice3 + "\",\"" + choice4
+							 + "\",\"" + keyword + "\",\"" + solution +"\",\"" + answer + "\", null" ;
 		}
 
 	}// 버튼 클릭 이벤트 리스너 끝
 
 	// 콤보박스 리스너 시작
 	private class ComboBoxListener implements ActionListener {
+		public void set_large(JComboBox<?> combobox) {
+			large_CB.removeAllItems();
+			medium_CB.removeAllItems();
+			small_CB.removeAllItems();
+			
+			sub = combobox.getSelectedItem().toString();
+			
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub);
+//System.out.println("Subject : "+selectWhere);
+			large_items = getLMS.getLarge(classTable, sub, selectWhere);
+			large_CB.addItem(null);
+			// large_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> large_items_clone = (Vector<String>) large_items.clone();
+			for (String item : large_items_clone) {
+				large_CB.addItem(item);
+			}
+		}
+		public void set_medium(JComboBox<?> combobox) {
+			medium_CB.removeAllItems();
+			small_CB.removeAllItems();
+			L = combobox.getSelectedItem().toString();
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L);
+			medium_items = getLMS.getMedium(classTable, sub, L, selectWhere);
 
+			medium_CB.addItem(null);
+			// medium_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> medium_items_clone = (Vector<String>) medium_items.clone();
+			for (String item : medium_items_clone) {
+				medium_CB.addItem(item);
+			}
+		}
+		public void set_small(JComboBox<?> combobox) {
+			small_CB.removeAllItems();
+			M = combobox.getSelectedItem().toString();
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L, medium_CB.getName(), M);
+			small_items = getLMS.getSmall(classTable, sub, L, M, selectWhere);
+			
+			small_CB.addItem(null);
+			// small_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> small_items_clone = (Vector<String>) small_items.clone();
+			for (String item : small_items_clone) {
+				small_CB.addItem(item);
+			}
+		}
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			JComboBox<?> combobox = (JComboBox<?>) e.getSource();
-
+			
 			// 선택 된 ComboBox 의 종류에 따라 하위 분류를 가지고 오는 작업
-			if (combobox.getName() == "subject") {
-				sub = combobox.getSelectedItem().toString();
-
-				selectWhere = getLMS.getWhere(subject_CB.getName(), sub);
-				large_items = getLMS.getLarge(classTable, sub, selectWhere);
-
-				// large_items 벡터에 있는 개수 만큼 addItem 수행
-				for (String item : large_items) {
-					large_CB.addItem(item);
-				}
-
-			} else if (combobox.getName() == "large") {
-				L = combobox.getSelectedItem().toString();
-
-				selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L);
-				medium_items = getLMS.getMedium(classTable, sub, L, selectWhere);
-
-				// medium_items 벡터에 있는 개수 만큼 addItem 수행
-				for (String item : medium_items) {
-					medium_CB.addItem(item);
-				}
-			} else if (combobox.getName() == "medium") {
-
-				M = combobox.getSelectedItem().toString();
-
-				selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L, medium_CB.getName(), M);
-
-				small_items = getLMS.getSmall(classTable, sub, L, M, selectWhere);
-
-				// small_items 벡터에 있는 개수 만큼 addItem 수행
-				for (String item : small_items) {
-					small_CB.addItem(item);
-				}
+			if (combobox.getName() == "subject" && !(combobox.getSelectedItem()==null)) {
+				set_large(combobox);
+			} else if (combobox.getName() == "large"  && !(combobox.getSelectedItem()==null)) {
+				set_medium(combobox);
+			} else if (combobox.getName() == "medium"  && !(combobox.getSelectedItem()==null)) {
+				set_small(combobox);
 			}
 		}
 
@@ -482,12 +605,8 @@ class SelectOptionsInsForm extends JFrame {
 	private JPanel explain_P, solution_P, solexam_P;
 	private JTextField pNum_TB;
 	private JButton insert_Btn;
-	private JEditorPane problem_TA, addition_TA, exam1_TA, exam2_TA, exam3_TA, exam4_TA;
-	private JEditorPane explainK_TA, explainF_TA;
-	private RTFEditorKit prob_kit, addi_kit, exam1_kit, exam2_kit, exam3_kit, exam4_kit;
-	private RTFEditorKit expK_kit, expF_kit;
-	private StyledDocument prob_StyDoc, addi_StyDoc, exam1_StyDoc, exam2_StyDoc, exam3_StyDoc, exam4_StyDoc;
-	private StyledDocument expK_StyDoc, expF_StyDoc;
+	private JTextArea problem_TA, addition_TA, exam1_TA, exam2_TA, exam3_TA, exam4_TA;
+	private JTextArea explainK_TA, explainF_TA;
 	private JScrollPane  insert_Scr, problem_Scr, addition_Scr, exam1_Scr, exam2_Scr, exam3_Scr, exam4_Scr;
 	private JScrollPane explainK_Scr, explainF_Scr;
 	private JRadioButton solexam1_RB, solexam2_RB, solexam3_RB, solexam4_RB;
@@ -518,34 +637,16 @@ class SelectOptionsInsForm extends JFrame {
 			insert_Btn = new JButton("입력");
 
 			//EditorPane
-			problem_TA= new JEditorPane();
-			addition_TA= new JEditorPane();
-			exam1_TA= new JEditorPane();
-			exam2_TA= new JEditorPane();
-			exam3_TA= new JEditorPane();
-			exam4_TA= new JEditorPane();
-			explainK_TA= new JEditorPane();
-			explainF_TA= new JEditorPane();
+			problem_TA= new JTextArea();
+			addition_TA= new JTextArea();
+			exam1_TA= new JTextArea();
+			exam2_TA= new JTextArea();
+			exam3_TA= new JTextArea();
+			exam4_TA= new JTextArea();
+			explainK_TA= new JTextArea();
+			explainF_TA= new JTextArea();
 
-			//RTFEditorKit
-			prob_kit=new RTFEditorKit();
-			addi_kit=new RTFEditorKit();
-			exam1_kit=new RTFEditorKit();
-			exam2_kit=new RTFEditorKit();
-			exam3_kit=new RTFEditorKit();
-			exam4_kit=new RTFEditorKit();
-			expK_kit=new RTFEditorKit();
-			expF_kit=new RTFEditorKit();
-
-			//StyledDocument
-			prob_StyDoc = (StyledDocument)(prob_kit.createDefaultDocument());
-			addi_StyDoc = (StyledDocument)(addi_kit.createDefaultDocument());
-			exam1_StyDoc= (StyledDocument)(exam1_kit.createDefaultDocument());
-			exam2_StyDoc= (StyledDocument)(exam2_kit.createDefaultDocument());
-			exam3_StyDoc=(StyledDocument)(exam3_kit.createDefaultDocument());
-			exam4_StyDoc= (StyledDocument)(exam4_kit.createDefaultDocument());
-			expK_StyDoc= (StyledDocument)(expK_kit.createDefaultDocument());
-			expF_StyDoc= (StyledDocument)(expF_kit.createDefaultDocument());
+	
 
 			//JScrollPane
 			insert_Scr= new JScrollPane(insert_P);
@@ -561,8 +662,8 @@ class SelectOptionsInsForm extends JFrame {
 			//radiobutton
 			solexam1_RB = new JRadioButton("가");
 			solexam2_RB = new JRadioButton("나");
-			solexam3_RB = new JRadioButton("라");
-			solexam4_RB = new JRadioButton("다");
+			solexam3_RB = new JRadioButton("다");
+			solexam4_RB = new JRadioButton("라");
 			solution_G= new ButtonGroup();
 
 			//글루
@@ -600,22 +701,23 @@ class SelectOptionsInsForm extends JFrame {
 			//==문제
 			problem_P.setMaximumSize(new Dimension(820, 100));
 			problem_TA.setName("problem");
-			problem_TA.setEditorKit(prob_kit);
-			problem_TA.setDocument(prob_StyDoc);
-			problem_TA.setBorder(new TitledBorder(null, "문제", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			problem_TA.setPreferredSize(new Dimension(800, 100));
+			
+			problem_TA.setBorder(new TitledBorder(null, "문제", TitledBorder.LEADING, TitledBorder.TOP, null, null));	
+			problem_Scr.setMinimumSize(new Dimension(800,100));
+			problem_Scr.setMaximumSize(new Dimension(800,100));
+			problem_Scr.setPreferredSize(new Dimension(800,100));
 			problem_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
 			problem_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-
+			
+		
+			
 			//==추가사항
 			addition_P.setMaximumSize(new Dimension(820, 400));
 			addition_TA.setName("addition");
-			addition_TA.setEditorKit(addi_kit);
-			addition_TA.setDocument(addi_StyDoc);
 			addition_TA.setBorder(new TitledBorder(null, "추가사항", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			addition_TA.setPreferredSize(new Dimension(800, 400));
+			addition_Scr.setMinimumSize(new Dimension(800,400));
+			addition_Scr.setMaximumSize(new Dimension(800,400));
+			addition_Scr.setPreferredSize(new Dimension(800,400));
 			addition_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			addition_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
@@ -626,65 +728,65 @@ class SelectOptionsInsForm extends JFrame {
 
 			//보기1
 			exam1_TA.setName("choice1");
-			exam1_TA.setEditorKit(exam1_kit);
-			exam1_TA.setDocument(exam1_StyDoc);
 			exam1_TA.setBorder(new TitledBorder(null, "가", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			exam1_TA.setPreferredSize(new Dimension(800, 80));
+			exam1_Scr.setMinimumSize(new Dimension(800,100));
+			exam1_Scr.setMaximumSize(new Dimension(800,100));
+			exam1_Scr.setPreferredSize(new Dimension(800,100));
 			exam1_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			exam1_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 
 			//보기2
 			exam2_TA.setName("choice2");
-			exam2_TA.setEditorKit(exam2_kit);
-			exam2_TA.setDocument(exam2_StyDoc);
+			
 			exam2_TA.setBorder(new TitledBorder(null, "나", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			exam2_TA.setPreferredSize(new Dimension(800, 80));
+			exam2_Scr.setMinimumSize(new Dimension(800,100));
+			exam2_Scr.setMaximumSize(new Dimension(800,100));
+			exam2_Scr.setPreferredSize(new Dimension(800,100));
 			exam2_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			exam2_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 
 			//보기3
 			exam3_TA.setName("choice3");
-			exam3_TA.setEditorKit(exam3_kit);
-			exam3_TA.setDocument(exam3_StyDoc);
 			exam3_TA.setBorder(new TitledBorder(null, "다", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			exam3_TA.setPreferredSize(new Dimension(800, 80));
+			exam3_Scr.setMinimumSize(new Dimension(800,100));
+			exam3_Scr.setMaximumSize(new Dimension(800,100));
+			exam3_Scr.setPreferredSize(new Dimension(800,100));
 			exam3_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			exam3_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
 			//보기4
 			exam4_TA.setName("choice4");
-			exam4_TA.setEditorKit(exam4_kit);
-			exam4_TA.setDocument(exam4_StyDoc);
+			
 			exam4_TA.setBorder(new TitledBorder(null, "라", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			exam4_TA.setPreferredSize(new Dimension(800, 80));
+			exam4_Scr.setMinimumSize(new Dimension(800,100));
+			exam4_Scr.setMaximumSize(new Dimension(800,100));
+			exam4_Scr.setPreferredSize(new Dimension(800,100));
 			exam4_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			exam4_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 			//==풀이
-			explain_P.setMaximumSize(new Dimension(850, 300));
-			explain_P.setPreferredSize(new Dimension(850, 300));
+			explain_P.setMaximumSize(new Dimension(850, 320));
+			explain_P.setPreferredSize(new Dimension(850, 320));
 			explain_P.setLayout(new BoxLayout(explain_P, BoxLayout.Y_AXIS));
 			explain_P.setBorder(new TitledBorder(null, "풀이", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 			//키워드 풀이
 			explainK_TA.setName("keyword");
-			explainK_TA.setEditorKit(expK_kit);
-			explainK_TA.setDocument(expK_StyDoc);
-			explainK_TA.setMaximumSize(new Dimension(830, 50));
-			explainK_TA.setPreferredSize(new Dimension(830, 50));
+			
 			explainK_TA.setBorder(new TitledBorder(null, "Keyword", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			explainK_Scr.setMinimumSize(new Dimension(800,80));
+			explainK_Scr.setMaximumSize(new Dimension(800,80));
+			explainK_Scr.setPreferredSize(new Dimension(800,80));
 			explainK_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			explainK_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 			//전체 풀이
 			explainF_TA.setName("full");
-			explainF_TA.setEditorKit(expF_kit);
-			explainF_TA.setDocument(expF_StyDoc);
-			explainF_TA.setMaximumSize(new Dimension(830, 200));
-			explainF_TA.setPreferredSize(new Dimension(830, 200));
 			explainF_TA.setBorder(new TitledBorder(null, "Full", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			explainF_Scr.setMinimumSize(new Dimension(800,200));
+			explainF_Scr.setMaximumSize(new Dimension(800,200));
+			explainF_Scr.setPreferredSize(new Dimension(800,200));
 			explainF_Scr.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			explainF_Scr.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 

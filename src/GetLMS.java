@@ -10,12 +10,14 @@
 
  * */
 import java.util.Vector;
+import java.sql.*;
 
 public class GetLMS {
 
 	private Vector<String> items;
 	private Vector<String> bodies;
 	private String where;
+	ResultSet resultSet; //쿼리 결과를 담아올 변수
 
 	GetLMS() {
 		items = new Vector<String>();
@@ -25,52 +27,83 @@ public class GetLMS {
 
 	// 과목 선택 -> 대 분류 리턴
 	public Vector<String> getLarge(String table, String subject, String where) {
+		items.clear();
+		bodies.clear();
 		bodies.add("large");
 		// classification table 에서 subject 에 해당하는 내용읽어서 대 분류 채우기
-		items = Query.doSelects(bodies, table, where);
-
+		Query query =  new Query();
+		resultSet = query.doSelects(bodies, table, where);
+		try {
+			while(resultSet.next()){
+				items.add((String)resultSet.getObject(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		query.close();
 		return items;
 	}
 
 	// 대 분류 선택 -> 중 분류 리턴,
 	public Vector<String> getMedium(String table, String subject, String large,
 			String where) {
+		items.clear();
+		bodies.clear();
 		bodies.add("medium");
-		// classification table 에서 subject 에 해당하는 내용읽어서 대 분류 채우기
-		items = Query.doSelects(bodies, table, where);
-
+		// classification table 에서 subject 에 해당하는 내용읽어서 중 분류 채우기
+		Query query =  new Query();
+		resultSet = query.doSelects(bodies, table, where);
+		try {
+			while(resultSet.next()){
+//System.out.println("후...."+resultSet.getObject(2));
+				items.add((String)resultSet.getObject(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		query.close();
 		return items;
 	}
 
 	// 중 분류 선택-> 소 분류 리턴
 	public Vector<String> getSmall(String table, String suject, String large,
 			String medium, String where) {
+		items.clear();
+		bodies.clear();
 		bodies.add("small");
-		// classification table 에서 subject 에 해당하는 내용읽어서 대 분류 채우기
-		items = Query.doSelects(bodies, table, where);
-
+		// classification table 에서 subject 에 해당하는 내용읽어서 소 분류 채우기
+		Query query =  new Query();
+		resultSet = query.doSelects(bodies, table, where);
+		try {
+			while(resultSet.next()){
+				items.add((String)resultSet.getObject(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		query.close();
 		return items;
 	}
 
 	// 과목을 선택 했을 때
 	public String getWhere(String sub_attr, String sub) {
-		where = sub_attr + "=" + sub;
+		where = sub_attr + "=" + "\""+ sub + "\"";
 
 		return where;
 	}
 
 	// 대 분류를 선택 했을 떄
 	public String getWhere(String sub_attr, String sub, String L_attr, String L) {
-		where = sub_attr + "=" + sub + " AND " + L_attr + "=" + L;
-
+		where = sub_attr + "=" + "\""+ sub + "\"" + " AND " + L_attr + "=" + "\""+ L + "\"";
+		
 		return where;
 	}
 
 	// 중 분류를 선택 했을 때
 	public String getWhere(String sub_attr, String sub, String L_attr,
 			String L, String M_attr, String M) {
-		where = sub_attr + "=" + sub + " AND " + L_attr + "=" + L + " AND "
-				+ M_attr + "=" + M;
+		where = sub_attr + "=" +"\""+ sub + "\"" + " AND " + L_attr + "=" + "\"" + L + "\"" + " AND "
+				+ M_attr + "=" + "\""+ M + "\"";
 
 		return where;
 	}

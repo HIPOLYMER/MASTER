@@ -4,6 +4,11 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -11,6 +16,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,6 +25,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 
 
 public class OutFileForm extends JFrame {
@@ -27,6 +36,7 @@ public class OutFileForm extends JFrame {
 
 	//table 이름들
 	private String phTable, pbTable, bTable1, bTable2, classTable;
+
 
 	//OutFileForm GUI 변수들
 	private JScrollPane leftPane_Scr, rightPane_Scr;
@@ -52,11 +62,66 @@ public class OutFileForm extends JFrame {
 	Component related_glue,  related_glue_1,  button_glue,  button_glue_1,  button_glue_2;
 	Box button_Box,  related_Box;
 
-	
+	//ProblemListForm GUI 변수들
+	private ProblemListForm plist;
+	private JPanel listBody_P, list_P, count_P,  listButton_P;
+	private JTextField selectedCount_TB;
+	private JButton complete_Btn, clear_Btn ;
+	private JLabel count_L;
+	private Component count_glue_1, listButton_glue;
+	private JScrollPane  listScroll_P;
+
+	//problemList 에 동적 생성 될 변수들(초기화는 OutFileForm 클래스 내부에서 미리 해둔다.)
+	private Vector<JPanel> dynamic_P;
+	private Vector<JScrollPane> dynamic_Scr;
+	private Vector<JButton> dynamic_Btn;
+	private Vector<JTextArea> dynamic_TA;
+
+	//동적 생성에 부가적으로 필요한 변수들
+	private int count; //리스트가 하나 생성되면 +1 삭제되면 -1
+
+
+	// 선택 버튼이 눌리면 채워질 변수들
+	private int year, pNum;
+
+	Vector<Integer> problemID;
+	Vector<Integer> selected_problemID;
+	private String serial, type, subject;
+	private String classify, level;
+	private String large, medium, small;
+
+	// sub = 과목 저장 L=대 분류 M=중 분류 저장
+	private GetLMS getLMS;
+	private String sub, L, M;
+	private Vector<String> large_items, medium_items, small_items;
+
+	private Vector<String> adjust_phTable;
+	private Vector<String> adjust_pbTable;
+	private String selectWhere;
+
+	private Message message;
 
 	OutFileForm()
 	{
 		resolution=Toolkit.getDefaultToolkit().getScreenSize();
+
+		//
+		adjust_phTable = new Vector<String>();
+		adjust_pbTable = new Vector<String>();
+		phTable = "problemheader";
+		pbTable = "problembody";
+		classTable = "classification";
+		bTable1 = "basicoption1";
+		bTable2 = "basicoption2";
+		message = new Message();
+		getLMS = new GetLMS();
+		sub = null;
+		L = null;
+		M = null;
+		large_items = new Vector<String>();
+		medium_items = new Vector<String>();
+		small_items = new Vector<String>();
+		selectWhere = null;
 
 		//동적 생성할 변수 미리 초기화
 		dynamic_P=new Vector<JPanel>();
@@ -269,6 +334,7 @@ public class OutFileForm extends JFrame {
 		small_P.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
 		small_CB.setPreferredSize(new Dimension(400, 35));
 		small_CB.setName("small");
+		small_CB.addActionListener(new ComboBoxListener());
 
 		//relatedBox
 		related_Box.setMaximumSize(new Dimension((int)resolution.getWidth(), 50));
@@ -342,72 +408,266 @@ public class OutFileForm extends JFrame {
 		outfile_P.add(rightPane_Scr);
 		//===============rightPanel add 관계 끝=================//
 
+
+		//check box 이름 & 리스너
+		basic_CK.setName("basic");
+		app_CK.setName("app");
+		calc_CK.setName("calc");
+		high_CK.setName("high");
+		normal_CK.setName("normal");
+		easy_CK.setName("easy");
+		solutionK_CK.setName("K");
+		solutionF_CK.setName("F");
+
+		basic_CK.addActionListener(new CheckBoxListener());
+		app_CK.addActionListener(new CheckBoxListener());
+		calc_CK.addActionListener(new CheckBoxListener());
+		high_CK.addActionListener(new CheckBoxListener());
+		normal_CK.addActionListener(new CheckBoxListener());
+		easy_CK.addActionListener(new CheckBoxListener());
+
+		selected_problemID = new Vector<Integer>();
+
 		this.setTitle("파일출력");
 		this.pack();
+
+		fillInit();
 		setVisible(true);
 
 	}//생성자
 
+	// 생성자에서 호출되며, 기출 년도, 회차, 유형, 과목을 각 ComboBox에 채워 넣는 함수
+	private void fillInit() {
+		Query query =  new Query();
+		Vector<String> selectBasic1 = new Vector<String>();
+		Vector<String> selectBasic2 = new Vector<String>();
+		ResultSet resultSet;
+
+		//데이터 베이스에 질의
+		selectBasic1.add(year_CB.getName());
+		resultSet = query.doSelects(selectBasic1, bTable1, null);
+		selectBasic1.clear();
+		parseQuery(resultSet);
+		selectBasic1.add(serial_CB.getName());
+		resultSet = query.doSelects(selectBasic1, bTable1, null);
+		parseQuery(resultSet);
+		selectBasic2.add(type_CB.getName());
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
+		selectBasic2.clear();
+		parseQuery(resultSet);
+		selectBasic2.add(subject_CB.getName());
+		resultSet = query.doSelects(selectBasic2, bTable2, null);
+		parseQuery(resultSet);
+		//받아온 결과를 파싱 및 ComboBox 에 반영
+		parseQuery(resultSet);
+		query.close();
+		optionSelect();
+	}
+	private void parseQuery(ResultSet resultSet) {
+		// fillInit에서 읽어온 쿼리를 addItem 하기 전에 각 항목에 맞는 형태로 파싱하기 위한 작업
+		// 파싱을 하면서 곧 바로 addItem 을 하는 것이 편할 것으로 판단 됨.
+		//1. 파싱
+		//2. ComboBox에 저장
+		// year_CB.addItem(" ");
+		// serial_CB.addItem(); 형식
+		try {
+			ResultSetMetaData metaData = resultSet.getMetaData();
+
+			if(metaData.getColumnName(1).equals("year")){
+				year_CB.addItem(null);
+				while(resultSet.next())
+					year_CB.addItem((Integer) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("serial")){
+				serial_CB.addItem(null);
+				while(resultSet.next())
+					serial_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("type")){
+				type_CB.addItem(null);
+				while(resultSet.next())
+					type_CB.addItem((String) resultSet.getObject(1));
+			}else if(metaData.getColumnName(1).equals("subject")){
+				subject_CB.addItem(null);
+				while(resultSet.next())
+					subject_CB.addItem((String) resultSet.getObject(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public class ProblemListManager {
+		private Vector<String> pList;
+
+		public void insertToList() //문제 추가 버튼을 누를시 해당하는 문제들을 저장
+		{
+			int n;
+			boolean t = true;
+			if(toSelectCount_CB.getSelectedItem()!=null)
+				n = (int) toSelectCount_CB.getSelectedItem();
+			else
+				n = 0;
+			if(n!=0){
+				Collections.shuffle(problemID); //조건에 부합하는 문제들을 섞은 뒤
+				//중복처리
+				for(int i=0;i<n;i++){
+					for(int tempID : selected_problemID){
+						t=true;
+						if(tempID == problemID.get(i)){
+							if(n < Integer.parseInt(relatedProblem_TB.getText())){ //해당문제보다 선택할 문제수가 아직 적으면
+								n++;//선택할 문제인덱스를 하나 증가시켜 다른 문제로 뽑을 수 있도록한다.
+							}
+							else{
+								message.alertMessage(null, "이미 추가된 문제와 중복된 문제 있습니다. 원하는 문제 수보다 적게 추가 될 수 있습니다.");
+							}
+							t=false;
+							break;
+						}
+					}
+					if(t==true)
+						selected_problemID.add(problemID.get(i)); //problemID 들을 선택한 문제수만큼 선택
+				}
+				System.out.println(n + " <-n");
+				for(Integer item : selected_problemID)
+					System.out.println("item : "+item);
+			}
+
+		}
+		public void deleteFromList(int index) // - 버튼으로 문제 한줄 지울시
+		{
+
+		}
+		public void deleteAll() //한번에 모두 지울시
+		{
+			selected_problemID.clear();
+		}
+		public void getList() //현재 있는 문제들을 선택항목 확인 창에서 볼수 있는 형태로 출력해줌
+		{
+Vector<Vector<String>> problemHeader = new Vector<Vector<String>>();
+Query query = new Query();
+problemHeader = query.getProblemHeader(selected_problemID);
+query.close();
+System.out.println("=======================================");
+for(Vector<String> item : problemHeader){
+	for(String s : item)
+		System.out.println(s);
+	System.out.println("=======================================");
+}
+System.out.println("=======================================");
+Vector<Vector<String>> problemBody = new Vector<Vector<String>>();
+query = new Query();
+problemBody = query.getProblemBody(selected_problemID);
+query.close();
+for(Vector<String> item : problemBody){
+	for(String s : item)
+		System.out.println(s);
+	System.out.println("=======================================");
+}
+
+		}
+	}
 
 	private class ButtonClickListener implements ActionListener, ErrCheck, ClearGUI {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
+			ProblemListManager problemListManager = new ProblemListManager();
+
 			JButton button = (JButton) e.getSource();
-			if(button.getName() == "add_Btn")
+			if(button.getName() == "add_Btn") //추가 버튼 클릭시
 			{
-				dynamicList();
-				count+=1;
-				System.out.println(count);
+				//for(int problemID : selected_problemID)
+				//dynamicList(problemID);
+				//count+=1;
+				//System.out.println(count);
+				problemListManager.insertToList();
+				optionSelect();
 			}
-			else if(button.getName() == "print_Btn")
+			else if(button.getName() == "print_Btn") //출력 버튼 클릭시
 			{
-				//출력이 완료 되면 출력 완료 메시지를 띄운다.
-				Message msg = new Message();
-				msg.alertMessage(plist, "출력 완료");
+				JFileChooser filename = new JFileChooser();
+				filename.setMultiSelectionEnabled(false);
+
+				//insert file filter to select docx file.
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("docx", "docx");
+				filename.addChoosableFileFilter(filter);
+
+				filename.setFileFilter(filter);
+				int choice = filename.showSaveDialog(null);
+
+				//F, K 입력에 따라서 출력파일에 추가
+				if(choice==JFileChooser.APPROVE_OPTION){
+					File path = filename.getSelectedFile();
+
+				  	Vector<Vector<String>> problemHeader = new Vector<Vector<String>>();
+					Query query = new Query();
+					problemHeader = query.getProblemHeader(selected_problemID);
+					Vector<Vector<String>> problemBody = new Vector<Vector<String>>();
+					problemBody = query.getProblemBody(selected_problemID);
+					query.close();
+
+					//makeword 클래스 생성
+					/* 문제 정보를 인자로 problemHeader,problemBody를 넘김 + 파일저장경로
+					 * 생성자에서 problemHeader,problemBody 파싱
+
+					*/
+					try {	//MakeWord file
+						MakeWord file = new MakeWord(problemHeader, problemBody, path.toString()+".docx");
+						file.createColumns("2");
+						file.writeProblem(solutionK_CK.isSelected(), solutionF_CK.isSelected(), 'b');
+						file.saveFile();
+					} catch (Docx4JException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
+					//출력이 완료 되면 출력 완료 메시지를 띄운다.
+					Message msg = new Message();
+					msg.alertMessage(plist, "출력 완료");
+				}
 
 			}
-			else if(button.getName() == "selectedList_Btn")
+			else if(button.getName() == "selectedList_Btn") //선택항목확인
 			{
+				//추가 됐던 모든 리스트 삭제
+				if(dynamic_P.isEmpty() == false){
+					list_P.removeAll();
+					dynamic_Btn.removeAllElements();
+					dynamic_TA.removeAllElements();
+					dynamic_Scr.removeAllElements();
+					dynamic_P.removeAllElements();
+
+					//코딩시 제대로 지워지는지 확인 용.. 배포시에 필요없음
+					System.out.println(dynamic_P.isEmpty());
+
+					//제일 윗 부분은 재 생성
+					list_P.add(count_P);
+					list_P.repaint();
+				}
+				//전부 지운뒤 재생성
+				count = 0;
+				for(int problemID : selected_problemID){
+					count++;
+					dynamicList(problemID);
+				}
 				plist = new ProblemListForm();
+				optionSelect();
 			}
-			else if(button.getName()=="complete_Btn")
+			else if(button.getName()=="complete_Btn") //선택항목확인에서 완료버튼
 			{
-				//plist.dispatchEvent(new WindowEvent(plist, WindowEvent.WINDOW_CLOSING));
+				//plist.dispatchEvent(new WindowEvednt(plist, WindowEvent.WINDOW_CLOSING));
 				//plist.setVisible(false);
 				plist.dispose();
+				optionSelect();
 			}
-			else if(button.getName()=="clear_Btn")
-			{
-				//추가 됐던 모든 리스트 삭제 , count 를 0으로 만들어줌
 
-				list_P.removeAll();
-				dynamic_Btn.removeAllElements();
-				dynamic_TA.removeAllElements();
-				dynamic_Scr.removeAllElements();
-				dynamic_P.removeAllElements();
-
-				//코딩시 제대로 지워지는지 확인 용.. 배포시에 필요없음
-				System.out.println(dynamic_P.isEmpty());
-
-				//제일 윗 부분은 재 생성
-				list_P.add(count_P);
-				list_P.repaint();
-
-				count=0;
-			}
 		}
-		@Override
-		public void clearOptions() {
+
+//		@Override
+//		public void clearContents() {
 			// TODO Auto-generated method stub
 
-		}
-		@Override
-		public void clearContents() {
-			// TODO Auto-generated method stub
-
-		}
+//		}
 		@Override
 		public boolean checkDanglingElement() {
 			// TODO Auto-generated method stub
@@ -418,8 +678,27 @@ public class OutFileForm extends JFrame {
 			// TODO Auto-generated method stub
 			return false;
 		}
+		private String makeProblemInfo(int problemID){
+			String s = new String();
+			Vector<Integer> problemID_V = new Vector<Integer>();
+			problemID_V.add(problemID);
+			//s에 problemID에 해당하는 문제 정보를 담음
+			Vector<Vector<String>> problemHeader = new Vector<Vector<String>>();
+			Vector<Vector<String>> problemBody = new Vector<Vector<String>>();
+			Query query = new Query();
+			problemHeader = query.getProblemHeader(problemID_V);
+			problemBody = query.getProblemBody(problemID_V);
+			query.close();
+			if(problemHeader.size()>1){
+				for(int i=1;i<problemHeader.get(1).size();i++)
+					s += "["+problemHeader.get(1).get(i)+"]";
+				for(int i=0;i<(problemBody.get(1).size()-1);i++)
+					s += "["+problemBody.get(1).get(i)+"]";
+			}
+			return s;
+		}
 		//추가 버튼이 눌리면 동적으로 리스트를 생성해주는 함수
-		private void dynamicList()
+		private void dynamicList(int problemID)
 		{
 			//임시로 객체를 생성할 변수들
 			JPanel temp_P=new JPanel();
@@ -429,6 +708,7 @@ public class OutFileForm extends JFrame {
 
 			temp_TA.setSize(850,50);
 			temp_TA.setLineWrap(true);
+			temp_TA.setText(makeProblemInfo(problemID));
 
 			tempScroll_P.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			tempScroll_P.setPreferredSize(new Dimension(850,50));
@@ -442,14 +722,138 @@ public class OutFileForm extends JFrame {
 			temp_P.add(tempScroll_P);
 			temp_P.add(temp_Btn);
 
+			temp_TA.setEditable(false);
+
 			//Vector들 안에 객체를 추가
 			dynamic_P.add(temp_P);
 			dynamic_Scr.add(tempScroll_P);
 			dynamic_TA.add(temp_TA);
 			dynamic_Btn.add(temp_Btn);
+		//	dynamic_TA.get(1).setText("");
+			optionSelect();
+
+
 		}
 
 	}//ButtonClickListener
+
+	private void optionSelect(){
+		adjust_phTable.clear();
+		Query query= new Query();
+
+		if(basic_CK.isSelected() == true){
+			classify = basic_CK.getName();
+		}else if(app_CK.isSelected() == true){
+			classify = app_CK.getName();
+		}else if(calc_CK.isSelected() == true){
+			classify = calc_CK.getName();
+		}
+		if(high_CK.isSelected() == true){
+			level = high_CK.getName();
+		}else if(normal_CK.isSelected() == true){
+			level = normal_CK.getName();
+		}else if(easy_CK.isSelected() == true){
+			level = easy_CK.getName();
+		}
+
+		if(!(year_CB.getSelectedItem() == null)){
+			adjust_phTable.add("year=\"" + (int)year_CB.getSelectedItem() + "\"");
+		}
+		if(!(serial_CB.getSelectedItem() == null)){
+			adjust_phTable.add("serial=\"" + serial_CB.getSelectedItem().toString() + "\"");
+		}
+		if(!(type_CB.getSelectedItem() == null)){
+			adjust_phTable.add("type=\"" + type_CB.getSelectedItem().toString() + "\"");
+		}
+		if(!(subject_CB.getSelectedItem() == null)){
+			adjust_phTable.add("subject=\"" + subject_CB.getSelectedItem().toString() + "\"");
+		}
+		if(!(large_CB.getSelectedItem() == null)){
+			adjust_phTable.add("large=\"" + large_CB.getSelectedItem().toString() + "\"");
+		}
+		if(!(medium_CB.getSelectedItem() == null)){
+			adjust_phTable.add("medium=\"" + medium_CB.getSelectedItem().toString() + "\"");
+		}
+		if(!(small_CB.getSelectedItem() == null)){
+			adjust_phTable.add("small=\"" + small_CB.getSelectedItem().toString() + "\"");
+		}
+
+
+		if( (basic_CK.isSelected()==true) && (app_CK.isSelected()==true) &&(calc_CK.isSelected()==true) ){
+			adjust_phTable.add("(classify = \"" + basic_CK.getName() + "\" OR classify = \"" + app_CK.getName()+ "\" OR classify = \"" + calc_CK.getName() + "\")");
+		}else if( (basic_CK.isSelected()==true) && (app_CK.isSelected()==true) &&(calc_CK.isSelected()==false) ){
+			adjust_phTable.add("(classify = \"" + basic_CK.getName() + "\" OR classify = \"" + app_CK.getName() + "\")");
+		}else if( (basic_CK.isSelected()==true) && (app_CK.isSelected()==false) &&(calc_CK.isSelected()==true) ){
+			adjust_phTable.add("(classify = \"" + basic_CK.getName() + "\" OR classify = \"" + calc_CK.getName() + "\")");
+		}else if( (basic_CK.isSelected()==false) && (app_CK.isSelected()==true) &&(calc_CK.isSelected()==true) ){
+			adjust_phTable.add("(classify = \"" + app_CK.getName() + "\" OR classify = \"" + calc_CK.getName() + "\")");
+		}else if( (basic_CK.isSelected()==true) && (app_CK.isSelected()==false) &&(calc_CK.isSelected()==false) ){
+			adjust_phTable.add("classify = \"" + basic_CK.getName() + "\"");
+		}else if( (basic_CK.isSelected()==false) && (app_CK.isSelected()==true) &&(calc_CK.isSelected()==false) ){
+			adjust_phTable.add("classify = \"" + app_CK.getName() + "\"");
+		}else if( (basic_CK.isSelected()==false) && (app_CK.isSelected()==false) &&(calc_CK.isSelected()==true) ){
+			adjust_phTable.add("classify = \"" + calc_CK.getName() + "\"");
+		}
+
+		if( (high_CK.isSelected()==true) && (normal_CK.isSelected()==true) &&(easy_CK.isSelected()==true) ){
+			adjust_phTable.add("(level = \"" + high_CK.getName() + "\" OR level = \"" + normal_CK.getName()+ "\" OR level = \"" + easy_CK.getName() + "\")");
+		}else if( (high_CK.isSelected()==true) && (normal_CK.isSelected()==true) &&(easy_CK.isSelected()==false) ){
+			adjust_phTable.add("(level = \"" + high_CK.getName() + "\" OR level = \"" + normal_CK.getName() + "\")");
+		}else if( (high_CK.isSelected()==true) && (normal_CK.isSelected()==false) &&(easy_CK.isSelected()==true) ){
+			adjust_phTable.add("(level = \"" + high_CK.getName() + "\" OR level = \"" + easy_CK.getName() + "\")");
+		}else if( (high_CK.isSelected()==false) && (normal_CK.isSelected()==true) &&(easy_CK.isSelected()==true) ){
+			adjust_phTable.add("(level = \"" + normal_CK.getName() + "\" OR level \"= " + easy_CK.getName() + "\")");
+		}else if( (high_CK.isSelected()==true) && (normal_CK.isSelected()==false) &&(easy_CK.isSelected()==false) ){
+			adjust_phTable.add("level = \"" + high_CK.getName() + "\"");
+		}else if( (high_CK.isSelected()==false) && (normal_CK.isSelected()==true) &&(easy_CK.isSelected()==false) ){
+			adjust_phTable.add("level = \"" + normal_CK.getName() + "\"");
+		}else if( (high_CK.isSelected()==false) && (normal_CK.isSelected()==false) &&(easy_CK.isSelected()==true) ){
+			adjust_phTable.add("level = \"" + easy_CK.getName() + "\"");
+		}
+		/* problemHeader 테이블에 있는 내용이 아님
+		if(solutionF_CK.isSelected()==true){
+			adjust_phTable.add(" = " + solutionF_CK.getName());
+		}
+		if(solutionK_CK.isSelected()==true){
+			adjust_phTable.add(" = " + solutionK_CK.getName());
+		}*/
+
+		problemID = query.getProblemID(phTable, adjust_phTable);
+
+for (String item : adjust_phTable) {
+	System.out.println("phtable : "+item);
+}
+for (Integer item : problemID) {
+	System.out.println("problemID : "+ item);
+}
+
+
+	 	//해당 문제수 표시
+	 	relatedProblem_TB.setText(""+problemID.size());
+
+	 	//선택할 문제수 테이블 채우기
+	 	toSelectCount_CB.removeAllItems();
+	 	for(int i=1;i<=problemID.size();i++)
+	 		toSelectCount_CB.addItem(i);
+
+
+	 	Vector<String> q = new Vector<String>();
+	 	ResultSet resultSet;
+	 	q.add("COUNT(*)");
+	 	resultSet = query.doSelects(q,"problemheader",null);
+	 	try {
+			resultSet.next();
+			totalCount_TB.setText(""+resultSet.getObject(1));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 	query.close();
+
+	 	//총 선택된 문제수 채우기
+	 	if((selected_problemID!=null) && (selectedCount_TB!=null))
+	 		selectedCount_TB.setText(""+selected_problemID.size());
+	}
 
 	//선택 된 리스트에 추가됐을 때
 	private class ListDeleteListener implements ActionListener
@@ -458,7 +862,10 @@ public class OutFileForm extends JFrame {
 		public void actionPerformed(ActionEvent le) {
 			// TODO Auto-generated method stub
 			JButton lstDel_btn=(JButton)le.getSource();
-			removeDynamicList(lstDel_btn);
+			if(lstDel_btn.getName()=="clear_Btn") //선택항목확인에서 모두삭제 버튼
+				removeAll();
+			else
+				removeDynamicList(lstDel_btn);
 
 		}
 		private void removeDynamicList(JButton tempButton)
@@ -476,43 +883,121 @@ public class OutFileForm extends JFrame {
 					count-=1;
 					//코딩시 확인용
 					System.out.println(count);
+
+					//selected_problemID의 i번째 INDEX의 값도 지워야됨
+					selected_problemID.remove(i);
 				}
 				list_P.revalidate();
-
+				optionSelect();
 				//코딩시 확인용
 				System.out.println(dynamic_P.isEmpty());
 			}
 		}
+		private void removeAll()
+		{
+			//추가 됐던 모든 리스트 삭제
+			list_P.removeAll();
+			dynamic_Btn.removeAllElements();
+			dynamic_TA.removeAllElements();
+			dynamic_Scr.removeAllElements();
+			dynamic_P.removeAllElements();
+
+			//코딩시 제대로 지워지는지 확인 용.. 배포시에 필요없음
+			System.out.println(dynamic_P.isEmpty());
+
+			//제일 윗 부분은 재 생성
+			list_P.add(count_P);
+			list_P.repaint();
+
+			ProblemListManager problemListManager= new ProblemListManager();
+			problemListManager.deleteAll();
+			optionSelect();
+		}
 
 	}
-
+	private class CheckBoxListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			optionSelect();
+		}
+	}
 	private class ComboBoxListener implements ActionListener {
+
+		public void set_large(JComboBox<?> combobox) {
+			large_CB.removeAllItems();
+			medium_CB.removeAllItems();
+			small_CB.removeAllItems();
+
+			sub = combobox.getSelectedItem().toString();
+
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub);
+//System.out.println("Subject : "+selectWhere);
+			large_items = getLMS.getLarge(classTable, sub, selectWhere);
+			large_CB.addItem(null);
+			// large_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> large_items_clone = (Vector<String>) large_items.clone();
+			for (String item : large_items_clone) {
+				large_CB.addItem(item);
+			}
+		}
+		public void set_medium(JComboBox<?> combobox) {
+			medium_CB.removeAllItems();
+			small_CB.removeAllItems();
+			L = combobox.getSelectedItem().toString();
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L);
+			medium_items = getLMS.getMedium(classTable, sub, L, selectWhere);
+
+			medium_CB.addItem(null);
+			// medium_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> medium_items_clone = (Vector<String>) medium_items.clone();
+			for (String item : medium_items_clone) {
+				medium_CB.addItem(item);
+			}
+		}
+		public void set_small(JComboBox<?> combobox) {
+			small_CB.removeAllItems();
+			M = combobox.getSelectedItem().toString();
+			selectWhere = getLMS.getWhere(subject_CB.getName(), sub, large_CB.getName(), L, medium_CB.getName(), M);
+			small_items = getLMS.getSmall(classTable, sub, L, M, selectWhere);
+			small_CB.addItem(null);
+			// small_items 벡터에 있는 개수 만큼 addItem 수행
+			Vector<String> small_items_clone = (Vector<String>) small_items.clone();
+			for (String item : small_items_clone) {
+				small_CB.addItem(item);
+			}
+		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
+			JComboBox<?> combobox = (JComboBox<?>) e.getSource();
+			// 선택 된 ComboBox 의 종류에 따라 하위 분류를 가지고 오는 작업
+			if (combobox.getName() == "subject" && !(combobox.getSelectedItem()==null)) {
+				set_large(combobox);
+			}else if (combobox.getName() == "subject" && (combobox.getSelectedItem()==null)) { //null 과목을 선택하면
+				large_CB.removeAllItems();
+				medium_CB.removeAllItems();
+				small_CB.removeAllItems();
+			}else if (combobox.getName() == "large"  && !(combobox.getSelectedItem()==null)) {
+				set_medium(combobox);
+			}else if (combobox.getName() == "large" && (combobox.getSelectedItem()==null)) { //null 대분류를 선택하면
+				medium_CB.removeAllItems();
+				small_CB.removeAllItems();
+			} else if (combobox.getName() == "medium"  && !(combobox.getSelectedItem()==null)) {
+				set_small(combobox);
+			}else if (combobox.getName() == "medium" && (combobox.getSelectedItem()==null)) { //null중분류를 선택하면
+				small_CB.removeAllItems();
+			}else if (combobox.getName() == "small" && !(combobox.getSelectedItem()==null)){
+				//
+			}
+			optionSelect();
+		}//actionPerformed()
 
-		}
+	}// 콤보 박스 리스너 끝
 
-	}
-	//ProblemListForm GUI 변수들
-	private ProblemListForm plist;
-	private JPanel listBody_P, list_P, count_P,  listButton_P;
-	private JTextField selectedCount_TB;
-	private JButton complete_Btn, clear_Btn ;
-	private JLabel count_L;
-	private Component count_glue_1, listButton_glue;
-	private JScrollPane  listScroll_P;
 
-	//problemList 에 동적 생성 될 변수들(초기화는 OutFileForm 클래스 내부에서 미리 해둔다.)
-	private Vector<JPanel> dynamic_P;
-	private Vector<JScrollPane> dynamic_Scr;
-	private Vector<JButton> dynamic_Btn;
-	private Vector<JTextArea> dynamic_TA;
 
-	//동적 생성에 부가적으로 필요한 변수들
-	private int count; //리스트가 하나 생성되면 +1 삭제되면 -1
-		
 	private class ProblemListForm extends JFrame
 	{
 
@@ -532,14 +1017,14 @@ public class OutFileForm extends JFrame {
 
 			selectedCount_TB=new JTextField();
 
-			complete_Btn=new JButton("완료");
+			complete_Btn=new JButton("닫기");
 			complete_Btn.setName("complete_Btn");
 			complete_Btn.addActionListener(new ButtonClickListener());
 
 			clear_Btn=new JButton("전체 삭제");
 			clear_Btn.setName("clear_Btn");
 			clear_Btn.setBackground(Color.RED);
-			clear_Btn.addActionListener(new ButtonClickListener());
+			clear_Btn.addActionListener(new ListDeleteListener());
 
 			//=============멤버 변수 초기화 끝=============//
 
@@ -579,5 +1064,7 @@ public class OutFileForm extends JFrame {
 		}
 
 	}//ProblemListForm
+
+
 
 }//OutFileForm
