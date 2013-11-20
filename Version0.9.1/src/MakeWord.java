@@ -43,7 +43,8 @@ public class MakeWord {
 	private static String path;
 	private static Vector<Vector<String>> problemHeader;
 	private static Vector<Vector<String>> problemBody;
-	private String indicatePic=null;	//this indicate picture
+	private String indicatePic;	//this indicate picture
+	private String pro_ans;
 	//constuctor
 	public MakeWord(Vector<Vector<String>> header, Vector<Vector<String>> body, String path) throws Docx4JException{
 
@@ -61,6 +62,7 @@ public class MakeWord {
 		this.problemHeader=header;
 		this.problemBody=body;
 		this.indicatePic="<??>";
+		this.pro_ans=new String();
 	}
 
 	//word file formatting method total 3 method
@@ -324,7 +326,7 @@ public class MakeWord {
 	//7. write body
 	public void writeProblem(boolean keyword, boolean solution, char align){
 		int j=0;
-		String pro_ans=null;
+		
 		for(j=0; j<problemBody.size(); j++){
 			if(j==0){
 				this.writeBr(5);
@@ -375,23 +377,23 @@ public class MakeWord {
 							WriteTextWithImg("나. "+remain, align, exsize, isexabold);
 						}
 						else
-							this.writeText("나."+remain, align, exsize, isexabold);
+							this.writeText("나. "+remain, align, exsize, isexabold);
 						break;
 					}
 					case 4:{
 						if(imgIn){
-							WriteTextWithImg("다."+remain, align, exsize, isexabold);
+							WriteTextWithImg("다. "+remain, align, exsize, isexabold);
 						}
 						else
-							this.writeText("다."+remain, align, exsize, isexabold);
+							this.writeText("다. "+remain, align, exsize, isexabold);
 						break;
 					}
 					case 5:{
 						if(imgIn){
-							WriteTextWithImg("라."+remain, align, exsize, isexabold);
+							WriteTextWithImg("라. "+remain, align, exsize, isexabold);
 						}
 						else
-							this.writeText("라."+remain, align, exsize, isexabold);
+							this.writeText("라. "+remain, align, exsize, isexabold);
 						break;
 					}
 					case 6:{
@@ -433,7 +435,7 @@ public class MakeWord {
 							break;
 						}
 						
-						pro_ans = Integer.toString(j)+" - " + text + " || ";
+						pro_ans += Integer.toString(j)+" - " + text + " || ";
 					}
 					}
 				}
@@ -441,6 +443,7 @@ public class MakeWord {
 			if(j==problemBody.size()-1){	//last problem we didn't want blank in the paper.
 				this.writeBr(5);
 				this.writeText(pro_ans, 'l', "18", false);
+				System.out.println(problemBody.size() + "j : " + Integer.toString(j));
 			}
 			else
 				this.writeBr(5);	//one problem is printed. To separate from previous one.
@@ -484,7 +487,7 @@ public class MakeWord {
 		return i+sep.length();
 	}
 
-	public void writeText(String content, char align, String size, boolean bold){
+	public void writeText(String content, char align, String size, boolean isbold){
 		P paragraph = factory.createP();
 		R run = factory.createR();
 		
@@ -500,9 +503,9 @@ public class MakeWord {
 		sz.setVal(fs);
 		rpr.setSz(sz);
 		
-		BooleanDefaultTrue isbold = factory.createBooleanDefaultTrue();
-		isbold.setVal(bold);
-		rpr.setB(isbold);
+		BooleanDefaultTrue bold = factory.createBooleanDefaultTrue();
+		bold.setVal(isbold);
+		rpr.setB(bold);
 		
 		Text con = factory.createText();
 		con.setValue(content);

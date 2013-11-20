@@ -30,9 +30,9 @@ class MainForm extends JFrame{
 	private JPanel blank_P, probIns_P, probAdj_P, outFile_P;
 	private JTabbedPane mainTabbed_P;
 	private JScrollPane	dbManage_Scr;
-	private JLabel year_L, serial_L, subject_L;
+	private JLabel year_L, subject_L;
 	private JLabel large_L, medium_L, small_L;
-	private JTextField year_TB, serial_TB, subject_TB;
+	private JTextField year_TB, subject_TB;
 	private JTextField large_TB, medium_TB, small_TB;
 	private JButton add_Btn, dbClear_Btn;
 	private JButton probIns_Btn, probAdj_Btn, outFile_Btn;
@@ -67,7 +67,6 @@ class MainForm extends JFrame{
 
 		//레이블 초기화
 		year_L=new JLabel("기출년도");
-		serial_L=new JLabel("회차");
 		subject_L=new JLabel("과목");
 		large_L=new JLabel("대 분류");
 		medium_L=new JLabel("중 분류");
@@ -75,7 +74,6 @@ class MainForm extends JFrame{
 
 		//텍스트 필드 초기화
 		year_TB=new JTextField();
-		serial_TB=new JTextField();
 		subject_TB=new JTextField();
 		large_TB=new JTextField();
 		medium_TB=new JTextField();
@@ -132,12 +130,7 @@ class MainForm extends JFrame{
 		year_TB.setPreferredSize(new Dimension(100, 30));
 		year_TB.setName("year");
 
-		serial_L.setPreferredSize(new Dimension(80, 30));
-		serial_L.setBorder(new EmptyBorder(10, 10, 0, 0));
-		serial_TB.setPreferredSize(new Dimension(80, 30));
-		serial_TB.setName("serial");
-
-
+	
 		//persub_P
 		persub_P.setBorder(new TitledBorder(null, "과목, 대/중/소 분류", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
 		persub_P.setLayout(new BoxLayout(persub_P, BoxLayout.PAGE_AXIS));
@@ -201,10 +194,8 @@ class MainForm extends JFrame{
 		basic_P.add(basicText_P);
 
 		basicLabel_P.add(year_L);
-		basicLabel_P.add(serial_L);
 		basicLabel_P.add(subject_L);
 		basicText_P.add(year_TB);
-		basicText_P.add(serial_TB);
 		basicText_P.add(subject_TB);
 
 		//persub_P
@@ -320,13 +311,49 @@ class MainForm extends JFrame{
 			else if(evt_Btn.getName()=="add_Btn")
 			{
 				Query query = new Query();
-				query.doInserts("basicoption1","null,\""+year_TB.getText().toString()+"\""
-						+",\""+serial_TB.getText().toString()+"\"");
-				query.doInserts("basicoption2","null,\""+subject_TB.getText().toString()+"\"");
-				query.doInserts("classification","null,\""+subject_TB.getText().toString()+"\""
-						+",\""+large_TB.getText().toString()+"\""
-						+",\""+medium_TB.getText().toString()+"\""
-						+",\""+small_TB.getText().toString()+"\"");
+				
+				
+				if(!year_TB.getText().isEmpty()){
+					query.doInserts("basicoption1","null,\""+year_TB.getText().toString()+"\",\"1\"");
+					query.doInserts("basicoption1","null,\""+year_TB.getText().toString()+"\",\"2\"");
+					query.doInserts("basicoption1","null,\""+year_TB.getText().toString()+"\",\"3\"");
+					query.doInserts("basicoption1","null,\""+year_TB.getText().toString()+"\",\"4\"");
+				}
+				if(!subject_TB.getText().isEmpty()){
+					query.doInserts("basicoption2","null,\"A\",\""+subject_TB.getText().toString()+"\"");
+					query.doInserts("basicoption2","null,\"B\",\""+subject_TB.getText().toString()+"\"");
+					if(!large_TB.getText().isEmpty()){
+						if(!medium_TB.getText().isEmpty()){
+							if(!small_TB.getText().isEmpty()){
+								query.doInserts("classification","null,\""+subject_TB.getText().toString()+"\""
+										+",\""+large_TB.getText().toString()+"\""
+										+",\""+medium_TB.getText().toString()+"\""
+										+",\""+small_TB.getText().toString()+"\"");
+							}else{
+								query.doInserts("classification","null,\""+subject_TB.getText().toString()+"\""
+										+",\""+large_TB.getText().toString()+"\""
+										+",\""+medium_TB.getText().toString()+"\""
+										+",\"null\"");
+							}
+						}else{
+							query.doInserts("classification","null,\""+subject_TB.getText().toString()+"\""
+									+",\""+large_TB.getText().toString()+"\""
+									+",\"null\""
+									+",\"null\"");
+						}
+					}else{
+						query.doInserts("classification","null,\""+subject_TB.getText().toString()+"\""
+								+",\"null\""
+								+",\"null\""
+								+",\"null\"");
+					}
+					if(!year_TB.getText().isEmpty() && !subject_TB.getText().isEmpty()){
+						Message msg = new Message();
+						msg.alertMessage(null, "입력된 항목이 없습니다.");
+					}
+						
+				}
+				
 				query.close();
 			}
 
